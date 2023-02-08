@@ -1,0 +1,65 @@
+---
+title: "Untitled"
+author: "Joshua Susanto"
+date: '2023-02-07'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(htmlwidgets)
+fives <- c("5.00", "5100", "5-00", "5 00")
+str_view(fives,"5.00") 
+```
+
+metacharacters only for the second argument and not for the characters we want to view
+
+```{r}
+triplets <- c("193", "123", "ABC", ":-)")
+str_view(triplets, "[0-9][0-9][0-9]")
+```
+
+The pattern [ˆˆ] can be used to mean anything except the caret. But wait: I thought metacharacters needed to be escaped to be interpreted as literal characters?
+
+
+Most metacharacters inside a character set are already escaped.
+This implies that you do not need to escape them using double
+backslashes.
+Not all metacharacters become literal characters when they appear
+inside a character set. The exceptions are the opening bracket [,
+the closing bracket ], the dash -, the caret ˆ (if at the front or by
+itself), and the backslash \.
+The dot . inside the character set now represents the literal dot
+character rather than the wildcard character.
+
+it is important that the caret ˆ is the first character inside\
+the character set, otherwise the set is not a negative one.\
+For example, the pattern [A-Zˆ] mean any one upper case letter or\
+the caret character.
+
+```{r}
+basic <- c("1", "a", "A", "&", "-", "^", ".")
+str_view(basic, "[^^]")
+str_view(basic, "[^\\^]")
+str_view(basic, "[^A-Z]")
+str_view(basic, "[^.]")
+str_view(basic, "[^\\.]")
+```
+
+
+^ can be used as an anchor 
+and as not for character sets 
+anchors only work for the position theyre specified for
+
+```{r}
+text <- "the quick brown fox jumps over the lazy dog dog"
+str_view_all(text, "\\Afox")
+str_view_all(text, "ˆdog")
+str_view_all(text, "\\Athe")
+str_view_all(text, "^the")
+```
+
