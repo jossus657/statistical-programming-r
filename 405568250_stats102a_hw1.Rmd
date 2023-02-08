@@ -1,0 +1,196 @@
+---
+title: "Homework 1"
+author: "Joshua Susanto"
+date: '2023-01-22'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("405568250_stats102a_hw1.R")
+```
+
+## Question 1
+
+Please write a function, gcd(), which takes two arguments x, y and calculates their greatest
+common divisor (GCD) using the Euclidean algorithm.
+
+Make use of gcd() to write a function, lcm(), which takes a vector and find the least common
+multiple. The length of the vector will be at least two but no more than 100.
+
+#### **`gcd()`**
+
+**Algorithm:**
+
+1. Check for errors and undesirable inputs.
+
+2. Take the absolute values of x and y as GCD is not affected by sign
+
+3. Initialize the larger input to be the dividend and the smaller value to be the divisor
+
+4. Loop while the divisor is not equal to zero (as the Euclidean Algorithm will have our remainder be set as our new divisor)
+
+5. Apply the Euclidean Algorithm by using the modulus operator to find the remainder, set the new dividend to be the old divisor and old divisor to be the remainder
+
+6. Break from the loop when the remainder is equal to zero, return the current dividend
+
+**Test Cases:**
+```{r}
+gcd(47011, 73618)  # expected output: 1
+```
+```{r error=TRUE}
+gcd(11, '22')  # expected output: error
+```
+```{r}
+gcd(-1, 531)  # expected output: 1
+```
+```{r}
+gcd(72, 8)  # expected output: 8
+```
+```{r}
+gcd(180,25)   # expected output: 5
+```
+
+
+#### **`lcm()`**
+
+**Algorithm:**
+
+1. Check for errors and undesirable inputs.
+
+2. Check if length of x meets condition of being between 2 and 100
+
+3. Initialize the first value to be the first lcm (lcm1)
+
+4. Set another lcm (lcm2) to be the product of the first lcm and next value in the vector divided by their gcd (using the gcd function)
+
+5. Set lcm1 to be lcm2
+
+6. Repeat steps 4 and 5 until the final entry of the vector is reached. (Using a for loop)
+
+7. Return lcm2
+
+**Test Cases:**
+```{r}
+lcm(c(12, 21))  # expected output: 84
+```
+```{r error = TRUE}
+lcm(c('2', 988))  # expected output: error
+```
+```{r}
+lcm(c(4789, 6123, 199))  # expected output: 5835286353
+```
+```{r}
+lcm(c(72, 8))  # expected output: 72
+```
+```{r error = TRUE}
+lcm(c(4, 5, 0))   # expected output: error
+```
+
+## Question 2
+
+Please write a function get_factors() which takes a number x and returns a list object. The list
+object should contain the vector of unique prime factors of x and the corresponding exponents. In addition, write one “helper function” is_prime() that returns a logical vector depending on
+whether or not the elements in x are prime.
+
+
+
+
+For this problem I've defined another helper function check_prime() which takes a singular non-negative integer and returns a singular logical value indicating whether or not the integer is prime.
+
+I've added algorithms as well as test cases for any helper functions defined as well.
+
+
+#### **`check_prime()`**
+
+**Algorithm:**
+
+1. Check for errors and undesirable inputs. 
+
+2. Initialize variable y to be 2 (smallest prime number)
+
+3. See if y divides our input. If so, return false as it is automatically not prime.
+
+4. If not, add 1 to y and keep repeating step 3 until y is no longer less than our input.
+
+5. If y reaches our input, it tells us that our input is only divisible by itself. Thus, return TRUE as this means our input is prime
+
+**Test Cases:**
+```{r}
+check_prime(92392)  # expected output: FALSE
+```
+```{r error = TRUE}
+check_prime('22')  # expected output: error
+```
+```{r}
+check_prime(73)  # expected output: TRUE
+```
+```{r}
+check_prime(11)  # expected output: TRUE
+```
+```{r error = TRUE}
+check_prime(0.88)   # expected output: error
+```
+
+#### **`is_prime()`** 
+
+1. Set a variable n for the length of our vector and initialize an empty vector for the logical values of our output.
+
+2. Establish a loop with length n
+
+3. Check for errors and undesirable inputs, return an error or add FALSE to our output vector if necessary
+
+4. Utilize helper function check_prime() in an if statement and add a TRUE into our logical vector if the condition is satisfied and FALSE if not.
+
+5. After iterating through all entries of our input vector, return vector of logical values.
+
+**Test Cases:**
+```{r}
+is_prime(c(9222, 727, 100, 231, 22))  # expected output: FALSE TRUE FALSE FALSE FALSE
+```
+```{r error = TRUE}
+is_prime(c(9, 7, '1'))  # expected output: error
+```
+```{r}
+is_prime(c(9, 7, 1))  # expected output: FALSE TRUE FALSE
+```
+```{r}
+is_prime(c(72, 8))  # expected output: FALSE FALSE
+```
+```{r error = TRUE}
+is_prime(c(9, 0, 1))   # expected output: error
+```
+
+#### **`get_factors()`** 
+
+1. Check for errors and undesirable inputs and return an error if necessary.
+
+2. Initialize an empty list for unique prime values and another for the corresponding exponents. Initialize variable y to be 2. (smallest prime number)
+
+3. Check if y is prime, if so see if it divides our target number.
+
+4. If the condition in step 3 is met, use another loop to count how many times y divides our input. Save y in our unique primes vector and the exponent count in the exponent vector. Update x to account for the division(s) by y. If the condition is not met, continue.
+
+5. Add 1 to y and repeat steps 3 and 4 until x is 1, then return the factor and exponents vector as a list.
+
+**Test Cases:**
+```{r}
+get_factors(1920)  # expected output: $primes c(2, 3, 5) $exponents c(7, 1, 1)
+```
+```{r error = TRUE}
+get_factors(-28)  # expected output: error (ambiguity in negatives)
+```
+```{r}
+get_factors(12)  # expected output: $primes c(2, 3) $exponents c(2, 1)
+```
+```{r}
+get_factors(234)    # expected output: $primes c(2, 3, 13) $exponents c(1, 2, 1)
+```
+```{r}
+# expected output: TRUE
+x <- sample(x = 1e4, size = 1)
+y <- get_factors(x)
+this_works <- prod(y$primes ^ y$exponents) == x & all(is_prime(y$primes)) 
+this_works
+```
+

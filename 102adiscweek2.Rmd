@@ -1,0 +1,241 @@
+---
+title: "102a Week 2 Discussion"
+author: "Joshua Susanto"
+date: '2023-01-18'
+output: html_document
+---
+
+integer and modulo division
+```{r}
+10%/%3
+10%%3
+is.numeric(TRUE)
+is.numeric(c(1,2))
+is.numeric(c(1,'2'))
+xample <- c(2,'3')
+is.numeric(example)
+```
+
+
+```{r}
+gcd <- function(x,y) {
+# This function take in two integers (x and y) and returns their greatest common demoninator. This is done using the Euclidean Algorithm.
+#Args:
+#x: Singular integer
+#y: Singular integer
+#Return:
+#Singular integer (GCD of x and y)
+  if (is.numeric(x) == FALSE) {
+    stop('Error: One or more of the arguments are not integers.')
+  } else if (is.numeric(y) == FALSE) {
+    stop('Error: One or more of the arguments are not integers.')
+  }
+  if (x%%1 != 0 | y%%1 != 0) {
+    stop('Error: One or more of the arguments are not integers.')
+  }
+  x <- abs(x)
+  y <- abs(y)
+  dividend <- max(x,y)
+  divisor <- min(x,y)
+  while (divisor != 0) {
+    remainder <- dividend %% divisor
+    dividend <- divisor
+    divisor <- remainder
+  }
+  dividend
+}
+
+lcm <- function(x) {
+# This function takes in a vector of nonzero integers and returns the least common multiple of the integers. It does so by utilizing the gcd() function defined above.
+#Args:
+#x: Integer vector of length between 2 and 100
+#Return:
+#Singular integer (LCM of x)
+  n <- length(x)
+  if (n < 2 | n > 100) {
+    stop('Error: Value not between 2 and 100')
+  }
+  if (is.numeric(x) == FALSE) {
+    stop('Error: Vector must be numeric.')
+  }
+  if (0 %in% x) {
+    stop('Error: One or more entries contain zero')
+  }
+  if (x[1]%%1 != 0) {
+    stop('Error: Values must be integers')
+  }
+  lcm1 <- abs(x[1])
+  for (i in 2:n) {
+    if (x[i]%%1 != 0) {
+      stop('Error: Values must be integers')
+    }
+    lcm2 <- abs(x[i]) * lcm1 / gcd(x[i],lcm1)
+    lcm1 <- lcm2
+  }
+  lcm2
+}
+
+
+# memolization, map inputs to outputs by saving information
+## hashmap - not just memilize x, but the y in the while loop
+
+check_prime <- function(x) {
+# This function takes in a nonzero integer and returns whether or not it is a prime number through a logical value. This is a helper function used in the function is_prime().
+#Args:
+#x: Singular nonzero integer
+#Return:
+#Singular logical value
+  if (x <= 1) {
+    stop('Error: Invalid argument, must be nonnegative integer')
+  }
+  if (is.numeric(x) == FALSE) {
+    stop('Error: Invalid argument, must be nonnegative integer')
+  }
+  y <- 2
+  while (y < x) {
+    if (x%%y == 0 | x%%1 != 0) {
+      return(FALSE)
+    }
+    y = y + 1
+  }
+  return(TRUE)
+}
+
+
+is_prime <- function(values) {
+# This is a function which takes a vector of nonzero integers x and returns a logical vector object. This vector should give a TRUE whenever the corresponding x entry is a prime number and FALSE if not. This function utilizes the helper function check_prime() which returns a logical value depending on whether or not a singular non-negative integer is prime. This function itself is also a helper function for get_factors()
+#Args:
+#x: Vector of non-negative integers
+#Return:
+#Logical vector of the same length of x (TRUE if prime and FALSE if not)
+  primes <- c()
+  # primes <- rep(TRUE, n)
+  # for (x in 1:n) {}
+  for (x in values) {
+    if (x <= 0) {
+      stop('Values must be nonzero and nonnegative')
+    if (is.numeric(x) == FALSE) {
+    stop('Error: Invalid argument, must be nonnegative integer')
+  }
+    } else if (x == 1) {
+      primes <- c(primes, FALSE) # appends a FALSE
+      # remove above for comment
+    } else {
+      ## do not check primes
+      result <- check_prime(x)
+      primes <- c(primes, result)
+    }
+  }
+  primes
+}
+
+
+get_factors <- function(x) {
+# This is a function which takes a nonzero integer x and returns a list object. This list object should contain an entry with a vector of the unique prime factors of x and another with their corresponding exponents. This function utilizes the helper function is_prime() which returns a logical vector depending on whether or not the elements in x are prime.
+#Args:
+#x: Singular nonzero integer
+#Return:
+#List object of length 2 (prime factors and their functions)
+  if (x <= 1 | x%%1 != 0) {
+    stop('Error: invalid argument, x must be a positive integer')
+  if (is.numeric(x) == FALSE) {
+    stop('Error: Invalid argument, must be nonnegative integer')
+  }
+  #} else if (is_prime(x)) {
+    #primes <- x
+   # exponents <- 1
+  } else {
+    primes <- c()
+    exponents <- c()
+    y <- 2
+    while (x > 1) {
+      if (is_prime(y)) {
+        if (x%%y == 0) {
+          primes <- c(primes,y)
+          count = 0
+          while (x%%y == 0) {
+            x <- x/y
+            count = count + 1
+          }
+        exponents <- c(exponents, count)
+        }
+      }
+      y <- y + 1
+    }
+  }
+  factors <- list(primes = primes, exponents = exponents)
+  factors
+}
+
+
+# write test cases in the RMD
+
+```
+
+ALL GCD CLEAR
+```{r}
+gcd(1,10)
+gcd(0,0)
+gcd(1,0)
+gcd(1,1)
+gcd(10,0)
+gcd('2',2)
+gcd(11, '22')
+gcd(22.1,22)
+gcd(2,22.2)
+gcd(5, 5)
+gcd(0, 5)
+gcd(0, -5)
+gcd(12, 48)
+gcd(180,25) 
+gcd(72, 8)
+gcd(-1, 531)
+gcd(47011, 73618)
+```
+
+ALL LCM CLEAR
+```{r}
+lcm(c(1,2,3.5,5,6))
+lcm(c(1,2,35,5,6.2))
+lcm(c(0,2,35,5,6.2))
+lcm(c(1,2,35,5,0))
+lcm(c(1,2,35,0,6.2))
+lcm(c('2','4'))
+lcm(c(12, 21))
+lcm(c(4789, 6123, 199))
+```
+
+ALL CHECK PRIMES CLEAR
+```{r}
+check_prime(1)
+check_prime(0)
+check_prime('sda')
+check_prime(2)
+check_prime(92392)
+check_prime(177)
+check_prime(10)
+check_prime(11)
+check_prime(0.88)
+```
+
+ALL IS PRIMES CLEAR
+```{r}
+is_prime(c(9, 7, 1))
+is_prime(c(9, 70, 1))
+is_prime(c(9, 0, 1))
+is_prime(c(9, 7, '1'))
+is_prime(c(9222, 727, 100, 231, 22))
+is_prime(c(9222, 727, 0.7, 231, 22))
+```
+
+ALL GET FACTORS CLEAR
+```{r}
+get_factors(12)
+get_factors(1920)
+x <- sample(x = 1e4, size = 1)
+y <- get_factors(x)
+this_works <- prod(y$primes ^ y$exponents) == x & all(is_prime(y$primes))
+get_factors(35)
+get_factors(-28)
+```
+

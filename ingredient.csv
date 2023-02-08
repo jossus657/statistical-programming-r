@@ -1,0 +1,19 @@
+recipe,food_item,weight (oz)
+Spaghetti and Meatballs,Pasta,50
+Spaghetti and Meatballs,Meatballs,10
+Spaghetti and Meatballs,Tomato Sauce,5
+Spaghetti and Meatballs,Onions,1
+Beef Burger,Bread,10
+Beef Burger,Ground Beef,20
+Beef Burger,Onions,2
+Beef Burger,Tomato Sauce,3
+Cheese Soup,Onions,4
+Cheese Soup,Cheese,15
+Sandwich,Bread,15
+Sandwich,Onions,1
+Sandwich,Tomato ,2
+Sandwich,Turkey,10
+Turkey Burger,Bread,10
+Turkey Burger,Turkey,25
+Turkey Burger,Onions, 2
+Turkey Burger,Tomato Sauce, 4

@@ -1,0 +1,21 @@
+food_item,shop,price (US dollars per lb)
+Pasta,Food warehouse,1.5
+Meatballs,Food warehouse,5
+Tomato Sauce,Food warehouse,1.2
+Cheese,Food warehouse,6.5
+Ground Beef,Food warehouse,6
+Tomato,Food warehouse,5.5
+Bread,Food warehouse,2.5
+Turkey,Food warehouse,5
+Onions,MyMart,1
+Tomato Sauce,MyMart,1.6
+Meatballs,MyMart,5.5
+Tomato ,MyMart,5
+Turkey,MyMart,7
+Ground Beef,MyMart,5.8
+Cheese,Coco Mart,7
+Pasta,Coco Mart,1.4
+Onions,Coco Mart,1
+Bread,Coco Mart,3
+Tomato ,Coco Mart,4
+Turkey,Coco Mart,6

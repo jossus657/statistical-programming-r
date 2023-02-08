@@ -1,0 +1,358 @@
+---
+title: "102a Discussion Week 3"
+author: "Joshua Susanto"
+date: '2023-01-25'
+output: html_document
+---
+
+# Question 1
+
+runif(5, 111111111, 10^9) %/% 1 (random uniform between a and b and then take the floor)
+
+runif(5, 111111111, 10^9)
+
+```{r}
+set.seed(405568250)
+library(tidyverse)
+gradebook <- data.frame(UID = runif(100, 111111111, 10^9) %/% 1, 
+                        Homework_1 = runif(100, 0, 100) %/% 1,
+                        Homework_2 = runif(100, 0, 100) %/% 1,
+                        Homework_3 = runif(100, 0, 100) %/% 1,
+                        Homework_4 = runif(100, 0, 100) %/% 1,
+                        Homework_5 = runif(100, 0, 100) %/% 1,
+                        Quiz_1 = runif(100, 0, 100) %/% 1,
+                        Quiz_2 = runif(100, 0, 100) %/% 1,
+                        Quiz_3 = runif(100, 0, 100) %/% 1,
+                        Quiz_4 = runif(100, 0, 100) %/% 1,
+                        Quiz_5 = runif(100, 0, 100) %/% 1)
+```
+
+
+(b) Write R code in R markdown file to randomly replace 10% of Homework_4 and Quiz_4 by
+NA respectively, and then use is.na() in conjunction with sum() to show your results.
+```{r}
+a <- c(1,2,3)
+a[c(1,3)]
+a[c(1,3)] <- 0
+a
+gradebook$Homework_4
+runif(10,1,100)
+gradebook$Homework_4[floor(runif(10,1,100))]
+gradebook$Homework_4[floor(runif(10,1,100))] <- NA
+gradebook$Quiz_4[floor(runif(10,1,100))] <- NA
+sum(is.na(gradebook$Homework_4))
+# can also use sample and do same qith quiz 4
+?which
+?apply(array, margin, ...)
+apply(gradebook, FUN = is.na, MARGIN = 2)
+which(rowSums(apply(gradebook, FUN = is.na, MARGIN = 2)) > 0)
+meo <- which(colSums(apply(gradebook, FUN = is.na, MARGIN = 2)) > 0)
+meo <- as.vector(meo)
+meo
+c(1,2,3,4,25)[meo]
+sapply(gradebook, is.na)
+```
+
+
+```{r}
+test <- c(2,4,6,NA)
+mean(test, na.rm = TRUE)
+median(test, na.rm = TRUE)
+poopy <- as.vector(which(rowSums(apply(gradebook, FUN = is.na, MARGIN = 2)) > 0))
+for (i in poopy) {
+  print(i)
+  poopy2 <- mean(gradebook[i,], na.rm = TRUE)
+}
+sum(gradebook[6,], na.rm = TRUE)
+sum(gradebook[6,2:ncol(gradebook)], na.rm = TRUE)
+mean(gradebook[6,2:ncol(gradebook)], na.rm = TRUE)
+?mean
+indx <- grepl('Homework', colnames(gradebook))
+indx
+2:6
+```
+
+
+(c) Write a function messy_impute() that imputes missing values in the gradebook. Please
+also present your algorithm or flowchart to answer this question in the R markdown file.
+Note:
+• Imputation is the process of replacing missing values by estimated values. The simplest
+(far from preferred) method to impute values is to replace missing values by the most
+typical value, say the mean.
+• Assume the format of the gradebook is fixed (six homework and four quizzes), but NA
+values may occur in any assignments except for UID.
+• The messy_impute() function should have at least three arguments and ...:
+– A data frame contains the gradebook as specified in the example. However, the
+number of rows and where NA values occur may be different while grading.
+– A center argument should be a character object indicating the impute functions
+(Mean or Median). The default center is “Mean”.
+– A margin argument should be an integer (1 or 2) indicating either the function
+imputes the missing values by row/assignment (1) or by column/assignment (2). If
+choosing by column, the function should process homework and quizzes separately.
+• The function should return the imputed data frame (or tibble).
+```{r}
+messy_impute <- function(messy_table, center = 'Mean', margin, ...) {
+  #check if messy table is a df stop if not
+  if (is.data.frame(messy_table) == FALSE) {
+    stop('ERROR: Messy Table input must be a data frame.')
+  }
+  if (is.character(center) == FALSE) {
+    stop('ERROR: Center input must be a character (mean or median)')
+  }
+  #use row mean??
+  center <- tolower(center)
+  if (center == 'mean') {
+    if (margin == 2) {
+      index <- as.vector(which(rowSums(apply(messy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (i in index) {
+        hw <- messy_table %>% select(starts_with('H'))
+        quiz <- messy_table %>% select(starts_with('Q'))
+        imputehw <- mean(as.numeric(hw[i,2:ncol(hw)]), na.rm = TRUE, ...)
+        imputequiz <- mean(as.numeric(quiz[i,2:ncol(quiz)]), na.rm = TRUE, ...)
+        for (j in 1:ncol(messy_table)) {
+          if (is.na(messy_table[i,j])) {
+            if (j in 2:6) {
+              messy_table[i,j] <- imputehw
+            } else {
+              messy_table[i,j] <- imputequiz
+            }
+          }
+        }
+      }
+    }
+    if (margin == 1) {
+      index <- as.vector(which(colSums(apply(messy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (j in index) {
+        impute2 <- mean(messy_table[,j], na.rm = TRUE, ...)
+        for (i in 1:nrow(messy_table)) {
+          if (is.na(messy_table[i,j])) {
+            messy_table[i,j] <- impute2
+          }
+        }
+      }
+    }
+  } else if (center == 'median') {
+    if (margin == 2) {
+      index <- as.vector(which(rowSums(apply(messy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (i in index) {
+        hw <- messy_table %>% select(starts_with('H'))
+        quiz <- messy_table %>% select(starts_with('Q'))
+        imputehw <- median(as.numeric(hw[i,2:ncol(hw)]), na.rm = TRUE, ...)
+        imputequiz <- median(as.numeric(quiz[i,2:ncol(quiz)]), na.rm = TRUE, ...)
+        for (j in 1:ncol(messy_table)) {
+          if (is.na(messy_table[i,j])) {
+            if (j in 2:6) {
+              messy_table[i,j] <- imputehw
+            } else {
+              messy_table[i,j] <- imputequiz
+            }
+          }
+        }
+      }
+    }
+    if (margin == 1) {
+      index <- as.vector(which(colSums(apply(messy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (j in index) {
+        impute2 <- median(messy_table[,j], na.rm = TRUE, ...)
+        for (i in 1:nrow(messy_table)) {
+          if (is.na(messy_table[i,j])) {
+            messy_table[i,j] <- impute2
+          }
+        }
+      }
+    }
+  } else {
+    stop('ERROR: Center must be mean or median')
+  }
+  messy_table
+}
+```
+
+```{r}
+?rowMeans
+messy_impute(gradebook, margin = 2)
+messy_impute(gradebook, 'mean', 1)
+messy_impute(gradebook, 'mean', 1, trim = 0.25)
+messy_impute(gradebook, 'mean', 2)
+messy_impute(gradebook, 'mean', 2, trim = 0.25)
+mean(gradebook[,5], na.rm = TRUE, trim = 0.25)
+mean(values(gradebook[1,2:ncol(gradebook)]), na.rm = TRUE)
+?sum
+rowMeans()
+as.numeric(gradebook[1,2:ncol(gradebook)])
+!(3 %in% 1:2)
+if (!(3 %in% 1:2)) {
+    stop('ERROR: Margin must be an integer 1 or 2')
+  }
+```
+
+
+Select two students missing Homework_4 and two students missing Quiz_4. Please use
+these cases to demonstrate your function in the R markdown file. Here are some suggested
+cases but not limited to while grading.
+• messy_impute(gradebook, “mean”, 1)
+• messy_impute(gradebook, “median”, 2)
+• messy_impute(gradebook, “mean”, 1, trim = 0.25)
+
+check what the answers are before test cases
+
+
+(e) Write R code using the main function in the tidyr package to convert the gradebook into
+the tidy format. Name this object gradebook_tidy. You may directly write code in the R
+markdown file.
+
+```{r}
+gradebook_tidy <- as_tibble(gradebook) %>% pivot_longer(cols = names(gradebook)[-1], names_to = 'Assignment', values_to = 'Score')
+gradebook_tidy
+```
+
+```{r}
+which(rowSums(apply(gradebook_tidy, FUN = is.na, MARGIN = 2)) > 0)
+gradebook_tidy[which(rowSums(apply(gradebook_tidy, FUN = is.na, MARGIN = 2)) > 0), 1]
+temp <- gradebook_tidy %>% group_by(UID) %>% summarize(meanscore = mean(Score, na.rm = TRUE)) %>% filter(UID == 171790027)
+gradebook_tidy %>% group_by(Assignment) %>% summarize(meanscore = mean(Score, na.rm = TRUE))
+as.numeric(temp[1,2])
+as.numeric(gradebook_tidy[1,1])
+```
+```{r}
+as.character(gradebook_tidy[4,2])
+temp2 <- gradebook_tidy %>% group_by(Assignment) %>% summarize(meanscore = mean(Score, na.rm = TRUE)) %>% filter(Assignment == as.character(gradebook_tidy[4,2]))
+as.numeric(temp2[1,2])
+```
+
+
+(f) Write a function tidy_impute() that imputes missing values in gradebook_tidy object.
+The tidy_impute() function should have the same arguments as in the messy_impute()
+function. You should return an imputed gradebook_tidy object. Please also present your
+algorithm or flowchart to answer this question in the R markdown file.
+Note: Don’t convert gradebook_tidy object to be a messy format or reuse your
+messy_impute() in any steps of your tidy_impute().
+
+
+```{r}
+tidy_impute <- function(tidy_table, center = 'Mean', margin,...) {
+  #check if messy table is a df stop if not
+  # error handling w margin
+  #DOCSTRING
+  if (is_tibble(tidy_table) == FALSE) {
+    stop('ERROR: Messy Table input must be a tibble.')
+  }
+  if (is.character(center) == FALSE) {
+    stop('ERROR: Center input must be a character (mean or median)')
+  }
+  center <- tolower(center)
+  if (center == 'mean') {
+    if (margin == 2) {
+      index <- as.vector(which(rowSums(apply(tidy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (i in index) {
+        id <- as.numeric(tidy_table[i,1])
+        temp <- tidy_table %>% group_by(UID) %>% summarize(meanscore = mean(Score, na.rm = TRUE, ...)) %>% filter(UID == id)
+        tidy_table[i,3] <- as.numeric(temp[1,2])
+      }
+    }
+    if (margin == 1) {
+      index <- as.vector(which(rowSums(apply(tidy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (i in index) {
+        assignmnt <- as.character(tidy_table[i,2])
+        temp <- tidy_table %>% group_by(Assignment) %>% summarize(meanscore = mean(Score, na.rm = TRUE, ...)) %>% filter(Assignment == assignmnt)
+        tidy_table[i,3] <- as.numeric(temp[1,2])
+      }
+    }
+  } else if (center == 'median') {
+    if (margin == 2) {
+      index <- as.vector(which(rowSums(apply(tidy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (i in index) {
+        id <- as.numeric(tidy_table[i,1])
+        temp <- tidy_table %>% group_by(UID) %>% summarize(medianscore = median(Score, na.rm = TRUE, ...)) %>% filter(UID == id)
+        tidy_table[i,3] <- as.numeric(temp[1,2])
+      }
+    }
+    if (margin == 1) {
+      index <- as.vector(which(rowSums(apply(tidy_table, FUN = is.na, MARGIN = 2)) > 0))
+      for (i in index) {
+        assignmnt <- as.character(tidy_table[i,2])
+        temp <- tidy_table %>% group_by(Assignment) %>% summarize(medianscore = median(Score, na.rm = TRUE, ...)) %>% filter(Assignment == assignmnt)
+        tidy_table[i,3] <- as.numeric(temp[1,2])
+      }
+    }
+  } else {
+    stop('ERROR: Center must be mean or median')
+  }
+  tidy_table
+}
+```
+
+(g) Please use the cases you select from (d) to demonstrate your function in the R markdown
+file.
+
+```{r}
+tidy_impute(gradebook_tidy, margin = 2)
+tidy_impute(gradebook_tidy, 'mean', 1)
+tidy_impute(gradebook_tidy, 'mean', 1, trim = 0.25)
+messy_impute(gradebook, 'mean', 2)
+messy_impute(gradebook, 'mean', 2, trim = 0.25)
+```
+
+The formatting takes 10% of your homework grade. The accuracy takes 15% of your grade. The
+total is 25% for this question.
+(a) Please find three examples in which data might naturally be presented in a messy (non-tidy)
+way. For each example, include the context, observations, and variables that would be
+recorded. Showcase a small sample, say 10 observations, for each example. You may search
+online for context, but you MUST cite your sources. Please don’t make up data on your
+own.
+
+i've included the datasets found online in the homework folder
+
+1. movies.csv
+```{r}
+movies <- read_csv('movies.csv')
+head(movies, 10)
+```
+A dataset depicting movies/shows and their attributes may be untidy. Often times the names of the people who worked on the movie will be grouped up into one variable even though each person had their own role that could be categorized differently.
+I found this dataset on kaggle (https://www.kaggle.com/datasets/bharatnatrayn/movies-dataset-for-feature-extracion-prediction?resource=download) and it is data scrapped from imdb which highlights different movies and their features.
+
+
+1. movies.csv
+```{r}
+movies <- read_csv('movies.csv')
+head(movies, 10)
+```
+A dataset depicting movies/shows and their attributes may be untidy. Often times the names of the people who worked on the movie will be grouped up into one variable even though each person had their own role that could be categorized differently.
+I found this dataset on kaggle (https://www.kaggle.com/datasets/bharatnatrayn/movies-dataset-for-feature-extracion-prediction?resource=download) and it is data scrapped from imdb which highlights different movies and their features.
+
+2. iPhone information
+Another common form of messy data is how many tech companies display the specs of their devices. Many times the variables would be name of the product, spec 1, and other different specs. For example, many people would compare iPhones between each other by having the categories be something like storage or battery life with the observations being the price. This is messy as these categories should be their own observations and price needs its own category as well. 
+
+```{r}
+phones <- data.frame('model' = c('14 Pro Max', '14 Plus', '14 Pro'),
+                    '128 GB' = c(1099, 899, 999), 
+                    '256GB' = c(1199, 999, 1099),
+                    '512GB' = c(1399, 1199, 1299))
+phones
+```
+
+Source https://socialcompare.com/en/comparison/apple-iphone-product-line-comparison
+https://www.apple.com/shop/buy-iphone/iphone-14-pro
+
+3. Plane ticket data
+Similarly to iPhone information, airlines or travel search engines can also display their data in an untidy way. People often chart their prices and separate categories by the type of ticket. For example, a price comparison chart can see the airline name as a category with the other categories being the different ticket levels (business, economy, first-class, etc) with their observations being the price for those different tickets. This is incorrect as the different categories should be observations for a broader category. Additionally, price needs to have its own category as well. These charts can also put the different airlines or travel search engines as different categories as well which has the same issue.
+
+```{r}
+planes <- data.frame('trip' = c('LA to NY', 'LA to NY', 'LA to NY', 'FL to NJ', 'FL to NJ', 'FL to NJ' ),
+                    'Days until travel date' = c(2, 60, 120, 2, 60, 120),
+                    'Travelocity' = c(521, 279, 308, 454, 424, 442), 
+                    'Kayak' = c(529, 279, 345, 500, 414, 434),
+                    'Hotwire' = c(522, 279, 381, 455, 435, 443))
+planes
+```
+
+source 
+https://lenpenzo.com/blog/id1104-expedia-orbitz-priceline-and-others-a-comparison-of-travel-search-engines.html
+
+
+(b) For each of the three examples in (a), describe how the data might be better presented in a
+tidy way. Please use tidyverse functions to reorganize the small sample datasets in (a) into
+tidy format.
+
+1. The data can be better 
+
