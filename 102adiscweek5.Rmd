@@ -1,0 +1,82 @@
+---
+title: "102adiscweek5"
+author: "Joshua Susanto"
+date: "2023-02-08"
+output: html_document
+---
+
+
+3. Q
+- hw [let grader know]
+- regex
+- any [have to use with filter and groupby]
+- trim 
+- join [goes to next column]
+- unique key (unique)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+
+```{r}
+ingredients <- read_csv('ingredient.csv')
+ingredients
+```
+
+
+a. Write R code to return the food items required to cook the recipe “Beef Burger”.
+```{r}
+ingredients %>% filter(recipe == 'Beef Burger') %>% select(food_item)
+```
+
+b. Write R code to return all recipes containing both bread and tomato products with their
+weights on these two ingredients.
+
+use any because of the group by (IDGI)
+```{r}
+ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(food_item == 'Tomato' | food_item == 'Tomato Sauce'))
+?substr
+```
+
+```{r}
+ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(substr(food_item, 1, 6) == 'Tomato')) %>% filter(food_item == 'Bread' | substr(food_item, 1, 6) == 'Tomato') %>% group_by(recipe) %>% summarize(total_weight = sum(`weight (oz)`))
+```
+
+c. Write R code to return the food items and their prices for all items of meat products sold at
+“MyMart” or “Coco Mart”.
+
+```{r}
+food_item <- read_csv('food_item.csv')
+food_item
+```
+
+```{r}
+stock <- read_csv('stock.csv')
+stock
+```
+
+```{r}
+?trimws
+unique(stock$food_item)
+unique(food_item$item)
+```
+
+#use vector to select multiple columns
+```{r}
+stock %>% left_join(food_item, by = c('food_item' = 'item')) %>% filter(type == 'Meat', (shop == 'MyMart' | shop == 'Coco Mart')) %>% select(c(food_item, shop, `price (US dollars per lb)`))
+```
+
+
+d. Write R code to return the recipes with the total calories that contain “Wheat product”.
+
+```{r}
+recipe <- read_csv('recipe.csv')
+recipe
+```
+
+```{r}
+ingredients 
+```
+

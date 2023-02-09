@@ -5,6 +5,15 @@ date: '2023-02-07'
 output: html_document
 ---
 
+QUESTIONS:
+regex sets
+any
+- have to use with filter and groupby
+trim 
+join unique keys
+- when two keys are equal the next column is looked at to determine the unique key
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -62,4 +71,18 @@ str_view_all(text, "ˆdog")
 str_view_all(text, "\\Athe")
 str_view_all(text, "^the")
 ```
+
+
+```{r}
+pnx <- c("pan", "pen", "pin", "p0n", "p.n",
+"paun", "pwn3d")
+str_view(pnx, "p[ae.iou]n")
+str_view(pnx, "p\\wn")
+```
+
+
+
+
+
+
 
