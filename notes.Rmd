@@ -5,6 +5,14 @@ date: '2023-02-07'
 output: html_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## CHAPTER 4
+
 QUESTIONS:
 regex sets
 any
@@ -12,11 +20,6 @@ any
 trim 
 join unique keys
 - when two keys are equal the next column is looked at to determine the unique key
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ```{r}
 library(tidyverse)
@@ -81,8 +84,64 @@ str_view(pnx, "p\\wn")
 ```
 
 
+```{r}
+str_detect(pnx, "p[aeiou]") #is p followed by only [aeiou] (direct next character)
+str_detect(pnx, "p\\w") #is p followed by any word character (direct next character only)
+str_detect(pnx, "p[aeiou]n")
+str_detect(pnx, "p\\wn") 
+```
 
 
+Anchors
+
+```{r}
+text <- "the quick brown fox jumps over the lazy dog dog"
+str_replace_all(text, "the","-")
+## [1] "- quick brown fox jumps over - lazy dog dog"
+str_replace_all(text, "^the","-")
+## [1] "- quick brown fox jumps over the lazy dog dog"
+str_replace_all(text, "\\Athe","-") # same thing
+## [1] "- quick brown fox jumps over the lazy dog dog"
+```
+
+when it is in a literal it acts as an anchor, while in a set it acts as NOT
+
+```{r}
+text <- "words jump jumping umpire pump umpteenth lumps"
+str_replace_all(text, "\\bump","-") #is a front word boundary
+## [1] "words jump jumping -ire pump -teenth lumps"
+str_replace_all(text, "\\Bump","-") # is not a front word boundary
+## [1] "words j- j-ing umpire p- umpteenth l-s"
+str_replace_all(text, "ump\\b","-") # is an end word boundary
+## [1] "words j- jumping umpire p- umpteenth lumps"
+str_replace_all(text, "ump\\B","-") # is not an end word boundary     
+## [1] "words jump j-ing -ire pump -teenth l-s"
+```
+
+Question: What is the difference between ˆ[0-9], [ˆ0-9], and
+[0-9ˆ]?
+
+ATTEMPT:
+- first ^ means an anchor (first character is a digit between 0 and 9)
+- second ^ means not a number between 0 and 9
+- third ^ means ^ as a literal character 
+ANSWER:
+The caret ˆ outside of the character set is an anchor, so ˆ[0-9]
+matches strings that begin with a digit.
+The caret ˆ at the start of the character set is a negation, so
+[ˆ0-9] matches a character that is not a digit.
+The caret ˆ inside a character set but not at the start is the literal
+caret character, so [0-9ˆ] matches a character that is a digit or
+the caret.
 
 
-
+QUANTIFIERS
+Quantifiers can be attached to literal characters, character classes,
+or groups to match repeats.
+Pattern / Meaning
+* / Match 0 or more (is greedy)
++ / Match 1 or more (is greedy)
+? / Match 0 or 1
+{3} / Match Exactly 3
+{3,} / Match 3 or more
+{3,5} / Match 3, 4 or 5

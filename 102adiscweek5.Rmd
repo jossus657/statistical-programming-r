@@ -6,13 +6,6 @@ output: html_document
 ---
 
 
-3. Q
-- hw [let grader know]
-- regex
-- any [have to use with filter and groupby]
-- trim 
-- join [goes to next column]
-- unique key (unique)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -34,7 +27,7 @@ ingredients %>% filter(recipe == 'Beef Burger') %>% select(food_item)
 b. Write R code to return all recipes containing both bread and tomato products with their
 weights on these two ingredients.
 
-use any because of the group by (IDGI)
+use any because of the group by
 ```{r}
 ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(food_item == 'Tomato' | food_item == 'Tomato Sauce'))
 ?substr
@@ -50,15 +43,8 @@ c. Write R code to return the food items and their prices for all items of meat 
 ```{r}
 food_item <- read_csv('food_item.csv')
 food_item
-```
-
-```{r}
 stock <- read_csv('stock.csv')
 stock
-```
-
-```{r}
-?trimws
 unique(stock$food_item)
 unique(food_item$item)
 ```
