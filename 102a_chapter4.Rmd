@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Chapter 4 Notes"
 author: "Joshua Susanto"
 date: '2023-02-07'
 output: html_document
@@ -18,8 +18,10 @@ regex sets
 any
 - have to use with filter and groupby
 trim 
+- can specify left right or both to trim whitespace in a character
 join unique keys
 - when two keys are equal the next column is looked at to determine the unique key
+- primary keys must be unique, so if there are not unique values in our column then that column is not a primary key
 
 ```{r}
 library(tidyverse)
@@ -145,3 +147,81 @@ Pattern / Meaning
 {3} / Match Exactly 3
 {3,} / Match 3 or more
 {3,5} / Match 3, 4 or 5
+
+- match 0 refers to the quantifiers ability to match 0 length characters, or the character between every character
+- when you match 1 or more then this is not an issue
+
+```{r}
+text <- "words or numbers 9,876 and combos123 like password_1234"
+str_view_all(text, "\\S")
+str_view_all(text, "\\S+")
+```
+
+- we can see that when we don't have a quantifier and ask to view all letters, they are highlighted one at a time
+- conversely, when we use the + quantifiers, R searches for matches of length 1 or more, which in this case would be all of the words
+
+```{r}
+str_view_all(text, "\\d+")
+```
+
+- same concept but with digits in this example
+
+```{r}
+text2 <- "the year 1996 area code 310 combo123 password_1234 singledigit 5"
+str_replace_all(text, "\\d?", "-")
+str_replace_all(text2, "\\d?", "-")
+```
+
+- the ? quantifier matches either 0 or 1, so we are going to replace any 0 or 1 length digit characters with a '-'
+- since a zero length character is technically all types of character, this would mean that we put a dash where every zero space is
+- this creates even more zero spaces as we are adding a character and thus zeroes between them
+- so we add dashes between all letters (including before the first letter) 
+- even the space character has a zero char after it
+- read it left to right
+- whenever a length 1 replacement is found, this includes the zero character after it
+
+```{r}
+text3 <- "the year 1996 area code 310 combo123 password_1234 singledigit 5"
+str_replace_all(text3, "\\d{3}", "-")
+str_replace_all(text3, "\\d{2,4}", "-")
+```
+
+Quantifiers are by default greedy in the sense that they will return the
+longest match.
+Adding ? to a quantifier will make it ungreedy (or lazy).
+``` {r}
+text4 <- "Peter Piper picked a peck of pickled peppers"
+str_extract(text4,"P.*r") # returns the whole thing up to peppers as that is the biggest match
+str_extract(text4,"P.*?r") # returns Peter bc its the smallest match
+```
+- lazy returns the smallest available match that still satisfies the quantifier
+
+```{r}
+str_extract_all(text4, "P.*?r")
+str_extract_all(text4,"[Pp].*?r")
+```
+
+
+GROUPING AND CAPTURING
+
+- Parentheses ( ) define a group that groups together parts of a regular expression.
+- Besides grouping part of a regular expression together, parentheses also create a numbered capturing group: Any matches to the part of the pattern defined by the parentheses can be referenced by group number, either for modification or replacement.
+- By including ?: after the opening parenthesis, the group becomes a non-capturing group.
+- For example, in the pattern (abc)(def)(?:ghi), the pattern (abc) creates capturing group 1, (def) creates capturing group 2, and (ghi) is a group that is not captured.
+- Groups are used in conjunction with str_match() and str_match_all().
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
