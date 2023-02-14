@@ -202,7 +202,7 @@ str_extract_all(text4,"[Pp].*?r")
 ```
 
 
-GROUPING AND CAPTURING
+# GROUPING AND CAPTURING
 
 - Parentheses ( ) define a group that groups together parts of a regular expression.
 - Besides grouping part of a regular expression together, parentheses also create a numbered capturing group: Any matches to the part of the pattern defined by the parentheses can be referenced by group number, either for modification or replacement.
@@ -211,17 +211,98 @@ GROUPING AND CAPTURING
 - Groups are used in conjunction with str_match() and str_match_all().
 
 
+Some examples of the common syntax for groups:
+Pattern                       Meaning
+a(bc)d                        Match the text abcd, capture the text in the group bc
+(?:abc)                       Non-capturing group
+(abc)def(ghi)                 Match abcdefghi, group abc and ghi
+(Mrs|Ms|Mr|Mx)                Mrs or Ms or Mr or Mx (preference in the order given)
+\1, \2, etc.                  The first, second, etc. matched group (for str_replace())
+
+Note: Notice that the vertical line | is used for “or”, just like in logical expressions. The vertical line | is called the alternation operator.
+
+```{r}
+str_match("abcdefghijkl", "(abc)(def)(?:ghi)")
+str_match("abcdefghijkl", "abcdefghi")
+```
+
+- when you use str_match() r looks for the match in the text (1st argument) and pattern (2nd argument)
+- when we use () for grouping, we are telling R that we also want (this particular) pattern to be matched as well 
 
 
+```{r}
+text <- "Mr. Wyatt, Mrs. Haverford, Ms. Knope"
+pattern <- "Mrs|Ms|Mr|Mx"
+str_match_all(text, pattern)
+wrong_order <- "Mr|Mrs|Ms|Mx"
+str_match_all(text, wrong_order)
+```
+
+- since Mr is before Mrs in our pattern order, when we look through the text from left to right we get Mr as a match in Mrs. Haverford even though it could be considered for Mrs as well
+
+```{r}
+text <- "Mr. Wyatt, Mrs. Haverford, Ms. Knope, Andy Dwyer"
+capture <- "(Mrs|Ms|Mr)\\. (\\w+)"
+str_match_all(text,capture)
+```
+
+- for our pattern we want to capture the honorific with a period after it, then a space, then any group of letters (also captured)
+
+```{r}
+non_capture <- "(?:Mrs|Ms|Mr)\\. (\\w+)"
+str_match_all(text,non_capture)
+```
+
+- same as previous except we are not capturing the honorific
+
+```{r}
+text <- "Leslie Knope, April, Ludgate, Larry Gengurch,"
+pattern <- "(\\w+) (\\w+),"
+str_match_all(text, pattern)
+```
+
+- want the pattern (group of letters) space (group of letters) then comma,
+
+```{r}
+str_replace_all(text, pattern, "\\2, \\1;") 
+```
+
+- replace the matched text (so when the whole pattern is achieved) with 
+  (second captured group)(comma)(space)(first captured group)(semicolon)
+
+"Leslie(comma) Knope(semi) April, Ludgate, Larry(comma) Gengurch,"
+- switch the names
 
 
+```{r}
+text <- "abcdefghijklmnopqrstuvwxyz"
+pattern <- "b(\\w+)i"
+str_match(text, pattern)
+```
 
+- will match b - i but group c - h
 
+```{r}
+pattern2 <- "a(\\w+)(e[a-h]+)"
+str_match(text,pattern2)
+str_match(text,"a(\\w+)")
+```
 
+- match pattern a - h as it will match a pattern with a followed by any group of letters but it must have the next letter be an e after the first group is matched, the e is grouped with any match of letters from a - h, in this case the rest of the alphabet until h is grouped as the second group
 
+- for the second example we match the pattern "a" with an unlimited match of letters so the whole text is matched and the letters without a are grouped as a subgroup as it has a grouping symbol
 
+# Lookarounds
 
+Occasionally we want to match characters that have a certain pattern before or after it. There are statements called lookahead and lookbehind, collectively called lookarounds, that look ahead
+or behind a pattern to check if a pattern does or does not exist.
 
+Pattern         Name
+(?=...)         Positive lookahead
+(?!...)         Negative lookahead
+(?<=...)        Positive lookbehind
+(?<!...)        Negative lookbehind
+The lookbehind patterns must have a bounded length (no * or +).
 
 
 
