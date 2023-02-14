@@ -1,0 +1,131 @@
+---
+title: "Chapter 3 Notes"
+author: "Joshua Susanto"
+date: "2023-02-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+Chapter 3 Notes
+
+# Main Tidyverse Packages
+tibble: A package to introduce a more efficient data frame.
+readr: Functions to read rectangular data.
+tidyr: Functions to help make data “tidy.”
+dplyr: Functions for data manipulation.
+purrr: Functions to enhance R’s functional programming (i.e., vectorization).
+stringr: Functions for string (character) manipulation.
+forcats: Functions for factors (categorical variables).
+ggplot2: A graphics system based on the “Grammar of Graphics.”
+
+
+# %>% Operator
+- f(x) can be written as x %>% f()
+- f(x,y) can be written as x %>% f(y)
+- leads input into the first argument of the function
+
+x %>% f(y) %>% g(z) -> g(f(x,y),z)
+
+# Argument Placeholder
+The pipe operator can also be used as an argument placeholder by using a .
+on the righthand side to represent the object on the lefthand side
+
+f(x,y) can be written as y %>% f(x,.)
+
+ex: trees %>% lm(Volume ~ Height,data=.)
+
+
+# Tibbles
+- Tibbles are one of the central data structures used in the tidyverse
+- Tibbles are data frames with the added class tbl_df that makes the way R prints the object more readable 
+- The tibble() function can create tibbles, the same way that data.frame() does.
+- The as_tibble() function coerces lists and matrices into tibbles.
+
+```{r}
+# different ways to create tibble
+
+# read_csv -> separate by newline, first row are the column names, created geometrically. don't need commas to separate newline
+read_csv("X, Y, Z
+    1, 1, 1
+    2, 3, 4")
+
+# tibble() -> give column names with their values, separate each column with a comma as a separate argument
+tibble(
+   X = c(1, 2),
+   Y = c(1, 3),
+   Z = c(1, 4)
+  )
+
+# same as first, but putting newline manually
+read_csv("X, Y, Z \n 1, 1, 1\n 2, 3, 4")
+
+# a row wise version of tibble(), similar geometrically to read_csv, put tildas before column names, need commas to separate new line
+tribble(
+    ~X, ~Y, ~Z,
+   #---/---/---,
+    1,  1,  1,
+    2,  3,  4,
+)
+
+```
+
+
+# Tibbles Versus Data Frames
+- Column data is not coerced, a character vector is not coerced into a factor.
+- Subsetting a column from a tibble using the single bracket [,j] always returns a tibble vs a vector
+- The $ operator does not allow partial name matching the way it does
+for data frames
+
+- tibble always prints first 10 rows and all the columns that fit on the screen
+- width argument to specify how many columns to put
+- width = Inf prints all columns but puts the ones that dont fit on the next line
+
+```{r}
+data(diamonds)
+diamonds[['carat']] # can subset columns with double bracket and name in quotes, still returns a vector rather than a tibble
+diamonds[, 'carat'] # can also use dimensional ss
+diamonds[,1] # positional ss
+diamonds$carat # $ operator also returns a vector still (similar to double bracket)
+```
+
+# readr
+
+read_csv() reads comma delimited files.
+read_csv2() reads semicolon delimited files.
+read_tsv() reads tab delimited files.
+read_delim() reads files with any delimiter.
+read_fwf() reads fixed width files.
+read_table() reads files with white space separators.
+
+
+Optional Arguments in read_csv()
+- skip = n to skip the first n lines (e.g., if there is metadata at the top of the file).
+- comment = "#" to drop all lines starting with the # character.
+- col_names = FALSE to read files without column names. The columns will be labeled sequentially from X1 to Xn (for n columns). Alternatively, input a character vector in col_names to specify column names.
+- na argument to specify the character(s) that represent missing values in the file.
+
+# Tidy Data
+A dataset is called tidy if the following three rules are satisfied:
+Each variable must have its own column.
+Each observation must have its own row.
+Each value must have its own cell.
+
+The first step in tidying data is to figure out what the variables and
+observations are.
+
+The main functions in the tidyr package help make data tidy.
+Once the variables and observations are specified, there are several functions that address common issues with messy data:
+
+- pivot_longer is used when one variable is spread across multiple
+columns.
+- pivot_wider is used when one observation is scattered across
+multiple rows.
+- separate() is used when cells contain multiple values (from different
+variables).
+- unite() is used when a single variable is spread across multiple
+columns.

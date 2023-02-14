@@ -1,0 +1,23 @@
+---
+title: "Chapter 5 Notes"
+author: "Joshua Susanto"
+date: "2023-02-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(sloop)
+library(tidyverse)
+```
+
+
+## CHAPTER 5: OOP IN R
+
+Object-oriented programming (OOP) is a style of programming that focuses on defining different types of objects and functions that can be applied to those object types.
+Central to any object-oriented system are the concepts of class and method.
+- A class is a definition of an object. Typically a class contains several fields that are used to hold class-specific information.
+- A method is a function for a specific class.
+Intuitively, a class defines what an object is, and methods describe what
+that object can do
