@@ -129,3 +129,6 @@ multiple rows.
 variables).
 - unite() is used when a single variable is spread across multiple
 columns.
+
+
+#dplyr
