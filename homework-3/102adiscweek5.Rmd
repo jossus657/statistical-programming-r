@@ -1,0 +1,213 @@
+---
+title: "102adiscweek5"
+author: "Joshua Susanto"
+date: "2023-02-08"
+output: html_document
+---
+
+Q
+- 1.1d
+- 2.2a
+- 2.3a
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+```
+
+
+```{r}
+ingredients <- read_csv('ingredient.csv')
+ingredients
+```
+
+
+a. Write R code to return the food items required to cook the recipe “Beef Burger”.
+```{r}
+ingredients %>% filter(recipe == 'Beef Burger') %>% select(food_item)
+```
+
+b. Write R code to return all recipes containing both bread and tomato products with their
+weights on these two ingredients.
+
+use any because of the group by
+```{r}
+ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(food_item == 'Tomato' | food_item == 'Tomato Sauce'))
+?substr
+```
+
+```{r}
+ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(substr(food_item, 1, 6) == 'Tomato')) %>% filter(food_item == 'Bread' | substr(food_item, 1, 6) == 'Tomato') %>% summarize(total_weight = sum(`weight (oz)`))
+```
+
+c. Write R code to return the food items and their prices for all items of meat products sold at
+“MyMart” or “Coco Mart”.
+
+```{r}
+food_item <- read_csv('food_item.csv')
+food_item
+stock <- read_csv('stock.csv')
+stock
+unique(stock$food_item)
+unique(food_item$item)
+```
+
+#use vector to select multiple columns
+```{r}
+stock %>% left_join(food_item, by = c('food_item' = 'item')) # note the behavior of left join when there are multiple keys of the same name
+
+stock %>% left_join(food_item, by = c('food_item' = 'item')) %>% filter(type == 'Meat', (shop == 'MyMart' | shop == 'Coco Mart')) %>% select(c(food_item, shop, `price (US dollars per lb)`))
+```
+
+
+d. Write R code to return the recipes with the total calories that contain “Wheat product”.
+
+total calories of recipes that contain wheat??
+
+```{r}
+recipe <- read_csv('recipe.csv')
+recipe
+```
+
+```{r}
+ingredients 
+food_item
+```
+```{r}
+ingredients %>% left_join(food_item, by = c('food_item' = 'item')) %>% group_by(recipe) %>% summarize(total_cal = sum(calories))
+
+
+has_wheat <- ingredients %>% left_join(food_item, by = c('food_item' = 'item')) %>% group_by(recipe) %>% filter(type == 'Wheat product') %>% select %>% pull()
+
+ingredients %>% left_join(food_item, by = c('food_item' = 'item'))
+```
+
+```{r}
+ingredients %>% left_join(food_item, by = c('food_item' = 'item')) %>% filter(recipe %in% has_wheat) %>% group_by(recipe) %>% summarize(total_cal = sum(calories))  
+```
+
+
+2: Regular Expression Exercises
+• The exercises focus on using regular expressions and the stringer functions.
+• Don’t use any control statements.
+• Please find and download the corresponding files on the course website to complete the
+tasks below.
+• For each pattern, store the pattern as a variable named in the way pat_x_y where the x is the number of the exercise and the y is the letter of the sub-exercise.
+• You should save these patterns in your .R file.
+• You may demonstrate your patterns with any appropriate stringer functions.
+• The accuracy of your patterns account for 60% of this assignment.
+
+
+1. Find names.txt and write regex patterns to answer following questions.
+a. Find all usernames that contain at least one numeric character.
+
+```{r}
+names <- read.table(file = 'names.txt', sep = '\n')
+names <- names$V1
+names
+pat_1_a <- '.*[0-9].*'
+str_extract_all(names, pat_1_a)
+```
+
+b. Find all usernames that are exactly four characters long and consist only of alphabetic
+
+```{r}
+pat_1_b <- '\\A[[:alpha:]][[:alpha:]][[:alpha:]][[:alpha:]]\\Z'
+str_match_all(names, pat_1_b)
+```
+
+
+c. Find all usernames following the conventional way of name format, i.e., the “given name” goes first, and the “family” name last, with any other names in-between. The names are separated by a single white space and each name should be uppercase letter followed by one or more lowercase letters.
+
+```{r}
+pat_1_c <- '\\A[A-Z][[:alpha:]]+ ([A-Z][[:alpha:]]+ )*[A-Z][[:alpha:]]+\\Z'
+str_match_all(names, pat_1_c)
+str_match_all('Joshua  Susanto', pat_1_c)
+str_match_all('Joshua Susanto', pat_1_c)
+str_match_all('Joshua Joshj Susanto', pat_1_c)
+str_match_all('Joshua Joshj meow Susanto', pat_1_c)
+str_match_all('Joshua Joshj Joosh Susanto', pat_1_c)
+str_match_all('Joshua Joshj  Joosh Susanto', pat_1_c)
+```
+
+
+2. Find cards.txt and write the regex patterns to identify all the valid card numbers with the formatting rules below
+
+• A Master card number begins with a 5 and it is exactly 16 digits long.
+• A Visa card number begins with a 4 and it is between 13 and 16 digits long.
+
+a. Write a regex pattern to match valid Master card number and print all the valid
+numbers, grouped into sets of 4 separated by a single space.
+
+** Does it need to be separated by a space ?
+```{r}
+cards <- read.table(file = 'cards.txt', sep = '\n')
+cards <- cards$V1
+cards
+pat_2_a <- '\\A(5[0-9]{3})[ ]*([0-9]{4})[ ]*([0-9]{4})[ ]*([0-9]{4})\\Z'
+str_match_all(cards, pat_2_a)
+```
+
+
+
+b. Write a regex pattern to match valid Visa card number and print all the valid numbers,
+grouped into sets of 4 separated by a single space.
+Note: You may use more than one stringer function for both questions above.
+
+
+```{r}
+pat_2_b <- '\\A(4[0-9]+)'
+```
+
+3. Find the passwords.txt and write regex patterns to answer the following questions
+
+a. Write a regex pattern to identify the passwords that satisfies the requirements below.
+• Minimum 8 characters
+• Must contain at least one letter
+• Must contain at least one digit
+- can the other characters be other things?
+```{r}
+passwords <- read.table(file = 'passwords.txt', sep = '\n')
+passwords <- passwords$V1
+passwords
+pat_3_a <- '\\A(?=.*[[:alpha:]])(?=.*[0-9])[[:alnum:]]{8,}\\Z' #how does this work for ordering (1brownie)
+str_match_all(passwords, pat_3_a)
+```
+
+
+b. Write a regex pattern to identify the passwords that satisfies the requirements below.
+• Minimum 8 characters
+• Must contain at least one uppercase character
+• Must contain at least one lowercase character
+• Must contain at least one digit
+```{r}
+pat_3_b <- '\\A(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[[:alnum:]]{8,}\\Z' #how does this work for ordering (1brownie), does this act as an if statement
+str_match_all(passwords, pat_3_b)
+```
+
+
+
+4. Please load wordlists.RData to R and write regular expression patterns which will match all
+of the values in x and none of the values in y.
+a. Ranges
+
+- y only has first words start with g and after other than 6
+- of these 6 one contains m, u, j, y, r which are not in x
+- 5 of these 6 have letters on the fourth slot not in x
+- the last 1 has the second letter as o which is not in x
+
+```{r}
+load('wordlists.RData')
+range_x <- unlist(wordlists$Ranges[1])
+range_y <- unlist(wordlists$Ranges[2])
+pat_4_a <- '\\A[a-f][^o].[^mujyh].*'
+str_match_all(range_x, pat_4_a)
+str_match_all(range_y, pat_4_a)
+```
+
+b. Backrefs
+```{r}
+
+```
+

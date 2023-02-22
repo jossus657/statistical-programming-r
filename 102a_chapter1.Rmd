@@ -1,0 +1,47 @@
+---
+title: "Chapter 1 Notes"
+output: html_document
+date: "2023-02-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+Basic Data Structures
+
+Vectors
+- basic type of data in R
+- atomic and generic
+
+Atomic Vectors
+- have specific data type
+- logical, integer, double, char, complex, raw
+- vectors of consecutive integers can be created with :
+```{r}
+1:5
+c(1:4,5)
+c(1,2,3,4,5)
+```
+
+- if the L is not specified, will default to double
+- : created integers
+
+```{r}
+typeof(1:3)
+typeof(c(1,2,3))
+```
+
+Lists
+```{r}
+paste(c('a','b'), c('d','e','f'), collapse = ',')
+str_match('cucumber', '.*(..)\\1.*')
+```
+
+```{r}
+text <- "the quick brown fox jumps over the lazy dog dog"
+str_view_all(text, "\\Athe")
+```
+
