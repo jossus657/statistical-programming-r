@@ -38,7 +38,7 @@ ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(food
 ```
 
 ```{r}
-ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(substr(food_item, 1, 6) == 'Tomato')) %>% filter(food_item == 'Bread' | substr(food_item, 1, 6) == 'Tomato') %>% summarize(total_weight = sum(`weight (oz)`))
+ingredients %>% group_by(recipe) %>% filter(any(food_item == 'Bread') & any(substr(food_item, 1, 6) == 'Tomato')) %>% filter(food_item == 'Bread' | substr(food_item, 1, 6) == 'Tomato') %>% summarize(total_weight_oz = sum(`weight (oz)`))
 ```
 
 c. Write R code to return the food items and their prices for all items of meat products sold at
@@ -63,7 +63,7 @@ stock %>% left_join(food_item, by = c('food_item' = 'item')) %>% filter(type == 
 
 d. Write R code to return the recipes with the total calories that contain “Wheat product”.
 
-total calories of recipes that contain wheat??
+- total calories of recipes that contain wheat??
 
 ```{r}
 recipe <- read_csv('recipe.csv')
@@ -73,7 +73,9 @@ recipe
 ```{r}
 ingredients 
 food_item
+names(ingredients)
 ```
+
 ```{r}
 ingredients %>% left_join(food_item, by = c('food_item' = 'item')) %>% group_by(recipe) %>% summarize(total_cal = sum(calories))
 
@@ -84,7 +86,7 @@ ingredients %>% left_join(food_item, by = c('food_item' = 'item'))
 ```
 
 ```{r}
-ingredients %>% left_join(food_item, by = c('food_item' = 'item')) %>% filter(recipe %in% has_wheat) %>% group_by(recipe) %>% summarize(total_cal = sum(calories))  
+ingredients %>% left_join(food_item, by = c('food_item' = 'item')) %>% filter(recipe %in% has_wheat) %>% group_by(recipe) %>% summarize(total_cal = sum(`weight (oz)`*calories))  
 ```
 
 
@@ -133,7 +135,7 @@ str_match_all('Joshua Joshj  Joosh Susanto', pat_1_c)
 
 
 2. Find cards.txt and write the regex patterns to identify all the valid card numbers with the formatting rules below
-
+- spaces will only be by fours
 • A Master card number begins with a 5 and it is exactly 16 digits long.
 • A Visa card number begins with a 4 and it is between 13 and 16 digits long.
 
@@ -145,7 +147,7 @@ numbers, grouped into sets of 4 separated by a single space.
 cards <- read.table(file = 'cards.txt', sep = '\n')
 cards <- cards$V1
 cards
-pat_2_a <- '\\A(5[0-9]{3})[ ]*([0-9]{4})[ ]*([0-9]{4})[ ]*([0-9]{4})\\Z'
+pat_2_a <- '\\A(5[0-9]{3}) *([0-9]{4})[ ]*([0-9]{4})[ ]*([0-9]{4})\\Z'
 str_match_all(cards, pat_2_a)
 ```
 
@@ -167,6 +169,7 @@ a. Write a regex pattern to identify the passwords that satisfies the requiremen
 • Must contain at least one letter
 • Must contain at least one digit
 - can the other characters be other things?
+- change allnum to any printable char
 ```{r}
 passwords <- read.table(file = 'passwords.txt', sep = '\n')
 passwords <- passwords$V1
@@ -183,6 +186,8 @@ b. Write a regex pattern to identify the passwords that satisfies the requiremen
 • Must contain at least one digit
 ```{r}
 pat_3_b <- '\\A(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[[:alnum:]]{8,}\\Z' #how does this work for ordering (1brownie), does this act as an if statement
+# checks if there is anything that follows a capital -> if false will move ticker if true then it wont
+# think of lookarounds as conditionals
 str_match_all(passwords, pat_3_b)
 ```
 
@@ -201,13 +206,26 @@ a. Ranges
 load('wordlists.RData')
 range_x <- unlist(wordlists$Ranges[1])
 range_y <- unlist(wordlists$Ranges[2])
-pat_4_a <- '\\A[a-f][^o].[^mujyh].*'
-str_match_all(range_x, pat_4_a)
-str_match_all(range_y, pat_4_a)
+pat_4_a <- '\\A[a-f]*\\Z'
+all(str_detect(range_x, pat_4_a))
+any(str_detect(range_y, pat_4_a))
 ```
 
 b. Backrefs
 ```{r}
+backrefs_x <- unlist(wordlists$Backrefs[1])
+backrefs_y <- unlist(wordlists$Backrefs[2])
+pat_4_b <- '\\A([:alpha:]{3}).*\\1.*'
+str_match_all(backrefs_x, pat_4_b)
+str_match_all(backrefs_y, pat_4_b)
+```
 
+c. Prime
+```{r}
+primes_x <- unlist(wordlists$Prime[1])
+primes_y <- unlist(wordlists$Prime[2])
+pat_4_c <- '\\A(xx'
+str_match_all(backrefs_x, pat_4_b)
+str_match_all(backrefs_y, pat_4_b)
 ```
 
