@@ -1,0 +1,176 @@
+---
+title: "102a Homework 3"
+output: html_document
+date: "2023-02-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("405568250_stats102a_hw3.R")
+library(tidyverse)
+```
+
+
+## Question 1
+
+a. Write R code to return the food items required to cook the recipe “Beef Burger”.
+
+```{r}
+ingredients <- read_csv('ingredient.csv')
+ingredients %>% filter(recipe == 'Beef Burger') %>% select(food_item)
+```
+
+b. Write R code to return all recipes containing both bread and tomato products with their
+weights on these two ingredients.
+
+```{r}
+ingredients %>% 
+  group_by(recipe) %>% 
+  filter(any(food_item == 'Bread') & any(substr(food_item, 1, 6) == 'Tomato')) %>%
+  filter(food_item == 'Bread' | substr(food_item, 1, 6) == 'Tomato') %>%
+  summarize(total_weight_oz = sum(`weight (oz)`))
+```
+
+c. Write R code to return the food items and their prices for all items of meat products sold at “MyMart” or “Coco Mart”.
+
+```{r}
+food_item <- read_csv('food_item.csv')
+stock <- read_csv('stock.csv')
+```
+
+
+```{r}
+stock %>% 
+  left_join(food_item, by = c('food_item' = 'item')) %>% 
+  filter(type == 'Meat', (shop == 'MyMart' | shop == 'Coco Mart')) %>% 
+  select(c(food_item, shop, `price (US dollars per lb)`))
+```
+
+d. Write R code to return the recipes with the total calories that contain “Wheat product”.
+
+```{r}
+recipe <- read_csv('recipe.csv')
+```
+
+```{r}
+has_wheat <- ingredients %>% 
+  left_join(food_item, by = c('food_item' = 'item')) %>% 
+  group_by(recipe) %>% 
+  filter(type == 'Wheat product') %>% 
+  select %>% 
+  pull()
+
+ingredients %>% 
+  left_join(food_item, by = c('food_item' = 'item')) %>% 
+  filter(recipe %in% has_wheat) %>% 
+  group_by(recipe) %>% 
+  summarize(total_cal = sum(`weight (oz)`*calories))  
+```
+
+
+## Question 2
+
+1. Find names.txt and write regex patterns to answer following questions
+
+a. Find all usernames that contain at least one numeric character.
+
+```{r}
+names <- read.table(file = 'names.txt', sep = '\n')
+names <- names$V1
+names[str_detect(names, pat_1_a)]
+```
+
+b. Find all usernames that are exactly four characters long and consist only of alphabetic
+
+```{r}
+names[str_detect(names, pat_1_b)]
+```
+
+c. Find all usernames following the conventional way of name format, i.e., the “given name” goes first, and the “family” name last, with any other names in-between. The names are separated by a single white space and each name should be uppercase letter followed by one or more lowercase letters.
+
+```{r}
+names[str_detect(names, pat_1_c)]
+```
+
+2. Find cards.txt and write the regex patterns to identify all the valid card numbers with the formatting rules below
+
+a. Write a regex pattern to match valid Master card number and print all the valid
+numbers, grouped into sets of 4 separated by a single space.
+
+```{r}
+cards <- read.table(file = 'cards.txt', sep = '\n')
+cards <- cards$V1
+cards[str_detect(cards, pat_2_a)]
+```
+
+b. Write a regex pattern to match valid Visa card number and print all the valid numbers,
+grouped into sets of 4 separated by a single space.
+Note: You may use more than one stringer function for both questions above.
+
+```{r}
+cards[str_detect(cards, pat_2_b)]
+```
+
+
+3. Find the passwords.txt and write regex patterns to answer the following questions
+
+a. Write a regex pattern to identify the passwords that satisfies the requirements below.
+
+
+• Minimum 8 characters
+
+• Must contain at least one letter
+
+• Must contain at least one digit
+
+```{r}
+passwords <- read.table(file = 'passwords.txt', sep = '\n')
+passwords <- passwords$V1
+passwords[str_detect(passwords, pat_3_a)]
+```
+
+b. Write a regex pattern to identify the passwords that satisfies the requirements below.
+
+
+• Minimum 8 characters
+
+• Must contain at least one uppercase character
+
+• Must contain at least one lowercase character
+
+• Must contain at least one digit
+```{r}
+passwords[str_detect(passwords, pat_3_b)]
+```
+
+4. Please load wordlists.RData to R and write regular expression patterns which will match all of the values in x and none of the values in y.
+
+
+a. Ranges
+
+```{r}
+load('wordlists.RData')
+range_x <- unlist(wordlists$Ranges[1])
+range_y <- unlist(wordlists$Ranges[2])
+all(str_detect(range_x, pat_4_a))
+any(str_detect(range_y, pat_4_a))
+```
+
+b. Backrefs
+```{r}
+backrefs_x <- unlist(wordlists$Backrefs[1])
+backrefs_y <- unlist(wordlists$Backrefs[2])
+all(str_detect(backrefs_x, pat_4_b))
+any(str_detect(backrefs_y, pat_4_b))
+```
+
+c. Prime
+```{r}
+primes_x <- unlist(wordlists$Prime[1])
+primes_y <- unlist(wordlists$Prime[2])
+all(str_detect(primes_x, pat_4_c))
+any(str_detect(primes_y, pat_4_c))
+```
+
+
+
