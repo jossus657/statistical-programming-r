@@ -1,0 +1,125 @@
+---
+title: "102a Chapter 7 Notes"
+author: "Joshua Susanto"
+date: "2023-03-02"
+output: html_document
+---
+
+$$ y = \beta_0 + \beta_1*x + \beta_2*g(x)$$
+
+- given f(x) = y, a nonlinear function and x in R, find a root x for f(x) st f(x) = 0
+  - for quadratics -> quadratic equation
+  - factorization
+- not feasible for more complex functions
+
+# Bisection Meth0d
+
+Assume
+1. f is a continuous function
+2. a,b exists such that f(a)f(b) < 0
+
+Robustly
+
+$$\exists \gamma \in (a, b) \;\; s.t \;\; f(\gamma) = 0$$
+
+1. take middle point c such that c = (a + b)/2
+2. check (a, c) vs (c, b)
+  - if f(c)f(a) < 0 -> gamma in (a, c) 
+    - set b = c
+  - else, gamma in (c, b)
+    - set a = c
+3. repeat until c is close to gamma -> how do we know this?
+4. implement stop criteria (epsilon neighborhood)
+  - |b - a| <= e for e = 10^-6
+  - a max number of iterations in case our algorithm does not converge
+  - or if |f(c)| <= e
+  - or any combination of these three rules
+  
+Define error e = |c_0 - gamma| <= (b_0 - a_0)/2
+- next iteration multiplies this error by half
+- (0.5)^n(b - a) for n iterations
+and our error e is guaranteed to be less than or equal to this value
+
+e <= (0.5)^n(b - a) <= epsilon
+- where epsilon is our ideal range of error
+
+-> e(b - a)
+
+
+# Fixed Point Method
+
+Idea: Want to write f(x) = 0 as x = g(x)
+
+1. f(x) = x - g(x) = 0 -> g(x) = x - f(x)
+2. f(x) = g(x) - x = 0 -> g(x) = f(x) + x
+g(x0) = x1
+g(x1) = x2 -> xk+1 approx xk -> xk+1 = gamma
+...
+g(xk) = xk+1
+
+g(...g(g(g(gamma)))) = gamma
+
+stop when 
+1. |xk+1 - xk| <= epsilon for some small epsilon
+2. max number of iterations
+3. both
+
+ex.
+
+f(x) = logx - e^-x
+g(x) = f(x) + x = logx - e^-x + x
+g2(x) = x - f(x) = x - log x + e^-x
+
+set f(x) = 0 => logx = e^-x => x = e^e^-x = g3(x)
+
+we have 3 different ways to fing g functions, each have different levels of success depending on the original function
+  
+picture examples in phone pics
+
+Define error ek = |xk - gamma|
+             ek+1 = |xk+1 - gamma|
+                  = |g(xk) - g(gamma)|
+                  = |g'(xk)||xk - gamma| [lol where did this come from]
+                  = |g'(xk)|ek <= sup(|g'(xk)|)ek
+(fact: |g'(xk)| = |g(xk) - gamma|/|xk - gamma|)
+                  
+if |g'(xk)| < 1, ek+1 < ek => CONVERGENCE
+if |g'(xk)| > 1, ek+1 > ek => DIVERGE
+
+eg. for x in [1,2]
+g1(x) = logx - e^-x + x
+g2(x) = x - logx + e^-x
+
+|g'1(x)| = |1/x + e^-x + 1|
+|g'1(1)| = |1 + e^-1 + 1| > 1 
+Hence this diverges since x = 1 is the supremum of this function
+
+|g'2(x)| = |1 - 1/x - e^-x|
+|g'2(2)| = |1 - 1/2 - e^-2| = 0.364 < 1 
+Hence this converges
+
+
+i pick out bitches like they seasonal, my depression
+
+Assume |g'(xt)| < 1, the worse case is sup|g'(xk)| = M
+
+ek+1 <= Mek
+e1 <= Me0
+e2 <= Me1 <= Me0
+...
+ek <= M^ke0 <= epsilon
+
+k >= (log[epsilon(1 - M)] - log|xk - x1|)/logM
+
+# Newtons Method
+
+ASsume f(x) is differentiable with root gamma
+Assume f'(gamme) is not 0
+
+as we observe the roots of our tangent lines, we see that the x values approach gamma
+
+xk+1 = xk - f(xK)/f'(xk)
+
+stop when f' = 0
+
+

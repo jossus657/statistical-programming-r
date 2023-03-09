@@ -1,0 +1,54 @@
+---
+title: "102a Chapter 6 Notes"
+author: "Joshua Susanto"
+date: "2023-02-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Floating Point Rep
+
+```{r}
+x <- 0.3/3
+0.1 == x
+
+y <- 5 - 3 - 0.1 
+y == 1.9
+```
+
+- because every decimal representation in R is an approximation
+
+Binary
+
+(-1)^(0,1)(b1*2^0 + b2*2^1 + b3*2^2 +...+ bn*2^n) where bi is either 0 or 1 
+
+n bits yield 2^n unique positive numbers
+
+binary digits always read right to left (unless decimal)
+- think about them as placeholders
+
+(0010)2 == (2)10 --> 0010 in binary is equal to 2 in decimal
+
+110.01 = 2^2 + 2^1 + 0 + 0 + 2^-2 = 6.25
+
+
+find binary of 11
+
+11/2 -> 5 R1
+5/2 -> 2 R1
+2/2 -> 1 R0
+1
+
+Read bottom up to get 1011
+
+find binary of 0.25
+
+0.25*2 -> 0.5 -> 0
+0.5*2 -> 1.0 -> 1
+0.0*2 -> 0.0 -> 0
+
+we get .010
+
