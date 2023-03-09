@@ -15,9 +15,48 @@ library(tidyverse)
 
 ## CHAPTER 5: OOP IN R
 
-Object-oriented programming (OOP) is a style of programming that focuses on defining different types of objects and functions that can be applied to those object types.
-Central to any object-oriented system are the concepts of class and method.
+Object-oriented programming (OOP) is a style of programming that focuses on defining different types of objects and functions that can be applied to those object types. Central to any object-oriented system are the concepts of class and method.
 - A class is a definition of an object. Typically a class contains several fields that are used to hold class-specific information.
 - A method is a function for a specific class.
 Intuitively, a class defines what an object is, and methods describe what
 that object can do
+
+# Inheritance
+Another common feature in object-oriented programming languages is the concept of inheritance. Classes are usually organized in a hierarchy, so if a method does not exist for a child, then its parent’s method is used. We say the child inherits behavior from the parent.
+
+For example, an ordered factor inherits from a regular factor, and a tibble
+inherits from a data frame.
+
+
+# Polymorphism
+The primary reason to use OOP is polymorphism (which means “many shapes”), which refers to the ability to have a common interface for different types of inputs
+- Polymorphic functions are ones which behave differently for different types of input objects.
+- examples: print(), summary(), and plot().
+
+```{r}
+data("diamonds")
+summary(diamonds$depth)
+summary(diamonds$cut)
+```
+
+# Three OOP Systems
+Base R has three object-oriented systems (plus the base types).
+S3 is R’s first, simplest, and most flexible object-oriented system. S3 is
+the only object-oriented system used in the base and stats packages,
+and it is the most commonly used system in CRAN packages.
+S4 is a formalization of S3 that has much stricter implementation for
+defining classes, methods, and generic functions. S4 is implemented in
+the base methods package.
+RC, short for reference classes, is a very different system from S3
+and S4. RC implements “message-passing” OOP, so methods belong
+to classes, not functions.
+We will focus on the S3 system.
+
+
+# Base Types
+There is one other system that is not quite object-oriented, but is important to mention:
+
+Base types are the internal C-level types that are the basis of the other object-oriented systems.
+Base types do not form an OOP system, but they provide the building
+blocks for the other OOP systems.
+
