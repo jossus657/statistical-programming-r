@@ -1,0 +1,57 @@
+---
+title: "102a Chapter 9"
+author: "Joshua Susanto"
+date: "2023-03-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Randomization Tests
+
+Hypothesis Tests
+
+x ~ N(mx, sx)     -> x1,...,xn -> x_bar
+y ~ N(my, sy)     -> y1,...,yn -> y_bar
+
+H0:  mx = my
+H1:  mx > my
+
+or
+
+H0: mx - my = 0
+H1: mx - my > 0
+
+x_bar - y_bar
+
+p-value: p = p(observation as extreme or more extreme than one observed | H0 true)
+
+
+Assume
+
+x_bar - y_bar ~ N(mx - my, SD(x_bar - y_bar))
+
+a = sig level
+
+p > a => fail to reject null
+
+p < a -> reject null
+
+# CLT
+
+if n > 30 can assume that x and y bar follow a normal distribution
+and we can still use this standard procedure
+
+
+Example
+
+Population -> SRS -> 5 subjects -> Randomly Assign -> training (x)
+                                                   -> control (y)
+                                                   
+training (mx): 54, 66 -> mx = 60
+control (my): 57, 72, 30 -> my = 53
+
+H0: mx - my = 0
+H1: mx - my > 0
