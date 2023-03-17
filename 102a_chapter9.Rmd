@@ -45,7 +45,9 @@ if n > 30 can assume that x and y bar follow a normal distribution
 and we can still use this standard procedure
 
 
-Example
+# Example
+
+Trying to see if a training program works, samples 5 subjects. 2 train 3 do not
 
 Population -> SRS -> 5 subjects -> Randomly Assign -> training (x)
                                                    -> control (y)
@@ -55,3 +57,88 @@ control (my): 57, 72, 30 -> my = 53
 
 H0: mx - my = 0
 H1: mx - my > 0
+
+
+To find the probability of finding a certain mean, we can shuffle the 5 scores and undergo the experiment multiple times and have different observations be the trials of our experiment
+
+This would give us 5c3 possible combinations of people
+
+training trials
+54, 66
+54, 72
+54, 57
+...
+
+Control trials
+57, 70, 30
+57, 66, 30
+...
+
+xbar - ybar trials
+7, 12, -0.5, -23, 9.5, ...
+
+we are assuming that the mean follows our observed mean normally
+
+p-value = p(xbar - ybar >= 7| H0 is true) = 5/10 since there are 5 out of 10 outcomes that are greater than 7
+
+so we fail to reject
+
+if our hypothesis was this
+H0 = mu_y - mu_x = 0
+H1 = mu_x =/= mu_y
+
+in this case our p-value would be
+p(|x_bar - y_bar| >= 7 | H0 is true, or that  *how does this assumption translate)
+
+# Example 2
+
+population -> 50 samples -> randomly assign -> experiment
+                                            -> control
+n (experiment) = 34
+m (control) = 16
+
+p^n = 10/34 where there was a success w experiment
+p^m = 4/16 where there was a success w the control
+
+H0: pn = pm -> pn - pm = 0
+H1: pn > pm -> pn - pm > 0
+
+
+CONDITIONS FOR CLT
+
+n >= 30
+m >= 30
+np^ > 5 for both groups
+n(1 - p^) > 5 for both groups
+
+not satisfied --> use perturbation test instead
+
+
+
+p^n - p^m ~ N(p^n - p^m) for our null hypothesis assumption
+
+so then for our probability we can just look at the total combinations of having 34 total successes since if our assumption that x and y are the same likelihood then their category doesn't matter
+
+this would mean that we have 50c34 different possible combinations of 34 total successes
+
+so our p-value would be
+
+where pn - pm probability would be
+
+since we have 2 groups and
+group 1 has 34 ppl
+group 2 has 16
+
+so we will find every way to rearrange the 50 people (so a constant 14 successed) such that 34 will still be in group 1 and 16 will be in group two
+
+which gives us 50c34
+
+and the probability is the amount of combinations where the difference in the ratio is larger than 10/34 - 4/16 divided by 50c34
+
+p(pn - pm >= 10/34 - 4/16)
+
+
+
+
+
+
