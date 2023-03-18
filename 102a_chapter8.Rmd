@@ -1,0 +1,74 @@
+---
+title: "102a Chapter 8 Notes"
+output: html_document
+date: "2023-03-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Least Squares Regression
+
+suppose we have data for
+x = (x,...xn)
+y = (y,...,yn)
+
+and we want to fit a linear model st
+
+y^ = a + bx^ where y^ is our predicted value of y for any value x^
+
+the LEAST SQUARES REGRESSION LINE is the line where SSE is minimized (min residuals)
+
+argmin(sum(yi - (a + bxi))) for i = 1,...,n
+
+our arguments are a and b
+
+
+# Newton's Method for Optimization
+
+x* is a minimizer -> f'(x*) = 0 FONC
+
+have to check f''(x*) < 0 -> maximizer SOSC
+              f''(x*) > 0 -> minimizer SOSC
+
+Assume that our function is c^2 (twice cont differentiable)
+
+in our root finding methiod, we are trying to find gamma st f(gamma) = 0
+this is the same, but instead we are using this same algorithm to find f'(x*) = 0 and utilizing our first and second derivatives
+
+* assume that x* is not at our endpoints
+
+in R code:
+
+stop criteria ->
+  xk+1 = xk - f'(xk)/f''(xk)
+loop ->
+
+
+# Golden Section Search Method
+
+- assume that the derivative is not available
+- similar to bisection method
+
+
+- start your initial interval a and b
+- we want two points a1 and b1
+- our new interval will either be from a to b1 or from a1 to b
+- we wil go in the direction of the larger value (if we are looking for a maximizer)
+
+- if f(a1) < f(b1)
+we set a0 <- a1
+
+a1    b1    b0    is our new interval
+
+- if f(b1) < f(a1)
+
+a0    a1    b1    is our new interval
+
+we then find a new a2 or b2 and keep repeating 
+
+but how is this new value decided?
+
+we want our new intervals and values to keep the same ratios
+

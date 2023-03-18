@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -17,20 +18,11 @@ and third are p and q. And the fourth component is a vector of p + q + 1 integer
 and nine. For example, we can use the following object x to keep the number 87654.321.
 
 ```{r}
-x <- structure(list(sign = 1, p = 3, q = 4, nums = 1:8), class = "pqnumber")
-x
-```
-
-
-```{r}
-carry_over <- function(z) {
-  n <- length(z)
-  carry <- 0
-  for (i in 1:n) {
-    zi <- z[i] + carry
-    z[i] <- z[i]
-  }
-}
+y <- structure(list(sign = 1, p = 3, q = 4, nums = 1:8), class = "pqnumber")
+# nums give the numbers from right to left
+# p gives the place of the decimal
+# q gives how many to the left of decimal (starts at 0)
+y
 ```
 
 
@@ -45,3 +37,241 @@ is.factor(). Your predicate function should be is pqnumber() and should behave a
 expected.
 • A useful print() method should allow users to print a pqnumber object with the
 decimal representation defined as follows:
+
+CONSTRUCTOR
+```{r}
+# needs flow chart and test cases
+pqnumber <- function(sign, p, q, nums) {
+  if(abs(sign) != 1) {
+    stop('Sign should be +/- 1')
+  }
+  # need to check that p and q are nonnegative integers (whole numbers including 0)
+  # nums should be exactly length p + q + 1
+  # nums is a vector of digits
+  structure(list(sign = as.integer(sign), p = as.integer(p), q = as.integer(q), nums = as.integer(nums)), class = 'pqnumber')
+  
+}
+
+# TEST CASES ALL TRUE
+x <- pqnumber(1, 2, 0, c(4, 1, 3))
+x$sign == 1
+x$p == 2
+x$ q== 0
+all(x$nums == c(4, 1, 3)) 
+```
+
+
+```{r}
+c(1,2) == c(2,2) # notice the behavior of vector comparison, why we use all and any
+```
+
+```{r}
+y <- pqnumber(0.5, 2, 0, c(4, 1, 3)) #should be an error
+```
+
+
+PREDICATE
+
+```{r}
+# flow charts and test cases
+# cant just check if the class is pqnumber
+# an object can have multiple classes
+
+is_pqnumber <- function(x) {
+  any(class(x) == 'pqnumber')
+}
+```
+
+
+```{r}
+is_pqnumber(x) # true
+is_prnumber(3) # false
+is_pqnumber(matrix(0,3,3)) #false
+```
+
+
+PRINT
+
+```{r}
+print.pqnumber <- function(x, DEC = FALSE) {
+  if (DEC) {
+    if (x$sign == -1) {
+      sbit <- '-'
+    } else {
+      sbit <- ''
+    }
+    decimal <- paste(rev(x$nums[0:x$p]), collapse = '')
+    number <- paste(rev(x$nums[(x$p + 1):(x$p+x$q+1)]), collapse = '')
+    print_str <- paste(sbit, number, '.', decimal, sep = '')
+  } else {
+    print_str <- paste0("sign = ", x$sign, '\np = ', x$p, '\nq = ', x$q, '\nnums = ', paste(x$nums, collapse = ' '))
+  }
+  cat(paste0(print_str, '\n'))
+}
+```
+
+```{r}
+print.pqnumber(x)
+print.pqnumber(y, DEC = TRUE)
+```
+
+
+AS PQNUMBER
+
+```{r}
+as_pqnumber <- function(x, p, q) {
+  UseMethod('as_pqnumber')
+}
+
+as_pqnumber.numeric <- function(x, p, q) {
+  nums <- (abs(x) * 10^seq(p, -q)) %% 10 %/% 1
+  sgn <- if(x == 0) 1 else base::sign(x)
+  pqnumber(sgn, p, q, nums)
+}
+
+as_pqnumber(3.14, 2, 0)
+```
+
+AS NUMERIC GENERUC AS NUMERIC.PQNUMBER : METHOD
+
+```{r}
+as_numeric <- function(x) {
+  UseMethod('as_numeric')
+}
+as_numeric.pqnumber <- function(x) {
+  #converts pqnumber to numeric
+  #Args:
+  #x: pqnumber size 1
+  #Return:
+  #numeric size 1
+  dec_num <- 0
+  for(i in seq_along(x$nums)) {
+    dec_num <- dec_num + (x$nums[i] * 10^(i-1))
+  }
+  exp <- -1 * x$p
+  dec_num <- dec_num * x$sign * (10^exp)
+  dec_num
+}
+
+as_numeric.pqnumber(x)
+as_numeric(y)
+```
+
+
+ B)
+ 
+Addition and subtraction
+
+```{r}
+# note that borrowing and carry over are going to be one function
+abs_gtr <- function(a, b) {
+  if (a$q > b$q) {
+    b <- pqnumber(b$sign, b$p, a$q, c(b$nums, rep(0L, (a$q - b$q))))
+  } else if (b$q > a$q) {
+    a <- pqnumber(a$sign, a$p, b$q, c(a$nums, rep(0L, (b$q - a$q))))
+  }
+  for (i in 1:(a$q + 1)) {
+    if (rev(a$nums)[i] > rev(b$nums)[i]) {
+      return(TRUE)
+    } else if (rev(a$nums)[i] < rev(b$nums)[i]) {
+      return(FALSE)
+    }
+  }
+}
+
+carry_over <- function(z) {
+  n <- length(z)
+  carry <- 0
+  for (i in 1:n) {
+    zi <- z[i] + carry
+    z[i] <- zi %% 10
+    carry <- zi %/% 10
+  }
+  if (carry != 0) {
+    z[n+1] <- carry
+  }
+  z
+}
+
+add <- function(x, y) {
+  # error handle
+  max_p <- max(x$p, y$p)
+  max_q <- max(x$q, y$q)
+  n <- max_p + max_q + 1
+  z <- rep(0L, n)
+  if(x$sign == y$sign) {
+    x_vals <- x$nums
+    y_vals <- y$nums
+    sgn <- x$sign
+  } else {
+    if(abs_gtr(x,y)) {
+      x_vals <- x$nums
+      y_vals <- -y$nums
+      sgn <- x$sign
+    } else {
+      x_vals <- -x$nums
+      y_vals <- y$nums
+      sgn <- y$sign
+    }
+  }
+  z[(1 + max_p - x$p):(1 + max_p + x$q)] <- x_vals
+  z[(1 + max_p - y$p):(1 + max_p + y$q)] <- z[(1 + max_p - y$p):(1 + max_p + y$q)] + y_vals
+  z <- carry_over(z)
+  digit_offset <- length(z) - n
+  pqnumber(sgn, max_p, max_q + digit_offset, z)
+}
+
+
+subtract <- function(x, y) {
+  y$sign <- y$sign * -1
+  add(x, y)
+}
+``` 
+ 
+```{r}
+add(x,x)
+add(y, y)
+add(x, y)
+subtract(y, x)
+subtract(x, y)
+neg <- pqnumber(-1, 3, 4, c(1,2,3,4, 0,0,0,0))
+pos <-pqnumber(1, 3, 3, c(1,2,3,0, 1,0,0))
+add(pos, neg)
+add(neg, pos)
+subtract(pos, neg)
+subtract(neg, pos)
+```
+ 
+```{r}
+tes1 <-  pqnumber(1, 3, 4, c(1,2,3,4, 0,0,0,0))
+print.pqnumber(tes1, DEC = TRUE)
+tes2 <-  pqnumber(1, 3, 3, c(1,2,3,0, 1,0,0))
+print.pqnumber(tes2, DEC = TRUE)
+tes3 <- pqnumber(tes2$sign, tes2$p, tes1$q, c(tes2$nums, rep(0, (tes1$q - tes2$q))))
+print.pqnumber(tes3, DEC = TRUE)
+abs_gtr(x, y)
+abs_gtr(y, x)
+abs_gtr(tes1, tes2)
+```
+ 
+ MULTIPLY
+ 
+```{r}
+multiply <- function(x, y) {
+  n <- x$p + y$p + x$q + y$q + 1
+  z <- rep(0L, n)
+  for (r in 1:(1 + y$p + y$q)) {
+    x_leftover <- x$p + x$q 
+    z[r:(r + x_leftover)] <- z[r:(r + x_leftover)] + (x$nums * y$nums[r])
+  }
+  z <- carry_over(z)
+  digit_offset <- length(z) - n
+  sgn <- x$sign * y$sign
+  p_new <- x$p + y$p
+  q_new <- length(z) - p_new - 1
+  pqnumber(sgn, p_new, q_new, z)
+}
+multiply(pqnumber(1, 2, 0, c(4, 1, 3)), pqnumber(1, 2, 0, c(4, 1, 3)))
+```
+ 
+ 

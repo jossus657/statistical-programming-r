@@ -33,7 +33,6 @@ multiple. The length of the vector will be at least two but no more than 100.
 5. Apply the Euclidean Algorithm by using the modulus operator to find the remainder, set the new dividend to be the old divisor and old divisor to be the remainder
 
 6. Break from the loop when the remainder is equal to zero, return the current dividend
-
 **Test Cases:**
 ```{r}
 gcd(47011, 73618)  # expected output: 1
@@ -50,6 +49,7 @@ gcd(72, 8)  # expected output: 8
 ```{r}
 gcd(180,25)   # expected output: 5
 ```
+
 
 
 #### **`lcm()`**

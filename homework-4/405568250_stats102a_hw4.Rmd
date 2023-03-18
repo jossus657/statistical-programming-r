@@ -1,0 +1,308 @@
+---
+title: "Stats 102a Homework 4"
+output: html_document
+date: "2023-03-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("405568250_stats102a_hw4.R")
+```
+
+## Question 1
+
+(a) Write a constructor function, an appropriate predicate function, appropriate coercion
+functions, and a useful print() method.
+
+#### **`pqnumber()`**
+
+**Test Cases:**
+```{r}
+ex1 <- pqnumber(1, 2, 0, c(4, 1, 3))
+pqnumber(1, 2, 0, c(4, 1, 3))
+```
+```{r error=TRUE}
+pqnumber(0.5, 2, 0, c(4, 1, 3)) # expected output: error
+```
+```{r}
+ex2 <- pqnumber(sign = 1, p = 3, q = 4, nums = 1:8)
+pqnumber(sign = 1, p = 3, q = 4, nums = 1:8)
+```
+```{r}
+ex3 <- pqnumber(sign = -1, p = 5, q = 1, nums = c(2, 8, 2, 8, 1, 7, 2))
+pqnumber(sign = -1, p = 5, q = 1, nums = c(2, 8, 2, 8, 1, 7, 2)) 
+```
+```{r}
+ex4 <- pqnumber(sign = 1, p = 6, q = 0, nums = c(3, 9, 5, 1, 4, 1, 3))
+pqnumber(sign = 1, p = 6, q = 0, nums = c(3, 9, 5, 1, 4, 1, 3)) 
+```
+
+
+
+#### **`is_pqnumber()`**
+
+**Test Cases:**
+```{r}
+is_pqnumber(ex1) # expected output: true
+```
+```{r error=TRUE}
+is_pqnumber(213) # expected output: false
+```
+```{r error=TRUE}
+is_pqnumber(matrix(0,3,3)) # expected output: false
+```
+```{r}
+is_pqnumber(ex3) # expected output: true 
+```
+
+
+#### **`print.pqnumber()`**
+
+**Test Cases:**
+```{r}
+print.pqnumber(ex2)
+```
+```{r}
+print.pqnumber(ex2, DEC = TRUE) # expected: 87654.321
+```
+```{r}
+print.pqnumber(ex4)   
+```
+```{r}
+print(ex3, DEC = TRUE) # expected: -27.18282  
+```
+
+
+#### **`as_pqnumber()`**
+
+**Test Cases:**
+```{r}
+as_pqnumber(87654.321, 3, 4)
+```
+```{r}
+as_pqnumber(3.1415926, 7, 0) 
+```
+```{r}
+as_pqnumber.numeric(-27.18282, 5, 1)   
+```
+```{r error=TRUE}
+as_pqnumber(123, 2, '2') # expected: error  
+```
+
+
+
+#### **`as_numeric.pqnumber()`**
+
+**Test Cases:**
+```{r}
+as_numeric(ex1) # expected: 3.14
+```
+```{r}
+as_numeric.pqnumber(ex2) # expected: 87654.321
+```
+```{r}
+as_numeric.pqnumber(ex4) # expected: 3.141593
+```
+```{r}
+as_numeric(ex3) # expected: -27.18282
+```
+```{r error=TRUE}
+as_numeric.pqnumber(23) # expected: error
+```
+
+
+
+(b) Write an addition function add(x, y) and a subtraction function subtract(x, y).
+
+My function utilizes abs_gtr() instead of borrow.
+
+#### **`abs_gtr()`**
+
+**Algorithm:**
+
+1. Error handle as neccessary
+
+2. Check whether a or b has the larger q value
+
+3. If a has a larger q value, this means that there are more digits to the left of the decimal in a, since we want this value to be constant, we will fill the nums of a with 0 until the q values are the same
+
+4. a is replaces with a new pqnumber that has the same q as b (extra spaces were filled with 0)
+
+5. If b has a larger q value, then we do steps 3 and 4 with b
+
+6. Check the the reverse elements of the nums of a and b, the instance one element is larger than the other, that pqnumber has a greater magnitude
+
+7. If the first inputted pqnumber has a greater absolute value return TRUE and FALSE if otherwise
+
+
+**Test Cases:**
+```{r}
+test1 <-  pqnumber(1, 3, 4, c(1,2,3,4, 0,0,0,0))
+test2 <-  pqnumber(1, 3, 3, c(1,2,3,0, 1,0,0))
+abs_gtr(test1, test2) # expected: false
+```
+```{r}
+abs_gtr(test2, test1) # expected: true
+```
+```{r}
+abs_gtr(ex2, ex1) # expected: true
+```
+```{r error=TRUE}
+abs_gtr(ex3, 12) # expected: error
+```
+```{r}
+abs_gtr(ex4, ex3) # expected: False
+```
+```{r}
+abs_gtr(ex3, ex4) # expected: true
+```
+
+
+
+#### **`carry_over()`**
+
+**Algorithm:**
+
+1. Error handle as neccessary
+
+2. Set a length n to the length of our vector
+
+3. Set our initial 'carry' to be 0
+
+4. Loop over the indices of our vector (utilizing n in our loop definition), set a value to be the sum of our carry and our value of our vector at the index
+
+5. Mod the sum by 10 and append this value to our output vector, set our new carry to be the integer division of the sum by 10
+
+6. repeat steps 4 and 5 for the rest of the vector and return output vector
+
+
+
+#### **`add()`**
+
+**Algorithm:**
+
+1. Error handle as neccessary
+
+2. Set our max p and q to be the sum of the ps and qs of x and y respectively
+
+3. Set our length n to be the sum og our max p and q plus 1
+
+4. set a vector z to be a vector of all zeroes of length n
+
+5. Check if we have differing signs
+
+6. If our signs are equal, then we can keep our x, y, and sign values as is
+
+7. If our signs are different, we use abs_gtr() to check which pqnumber has the larger magnitude. If x is larger then we set our y values to be negative and our sign to be the sign of x. If y has a larger magnitude then we do the same thing except our x value are negative and we keep the sign of y.
+
+8. With our established x values, y values, and sign, we add our x values and y values into z and use our carry_over function on z
+
+9. We set our digit offset to be the length of z minus n in order to account for our final q value
+
+10. We finally return a pqnumber with our set sign, max p, max q subtracted with our digit offset, and carried over z as our nums
+
+
+**Test Cases:**
+```{r}
+print(add(ex1, ex2), DEC = TRUE) # 87657.461
+```
+```{r}
+print(add(ex2, ex3), DEC = TRUE) # 87627.13818
+```
+```{r}
+print(add(ex1, ex3), DEC = TRUE) # -24.04282
+```
+```{r}
+print(add(ex3, ex1), DEC = TRUE) # -24.04282
+```
+```{r error=TRUE}
+add(22, ex3) # error
+```
+
+
+
+#### **`subtract()`**
+
+**Algorithm:**
+
+1. Error handle as neccessary
+
+2. Flip the sign of our second pqnumber (y)
+
+3. Use add on our first number and our second flipped number
+
+4. The nature of our add function ensures that the output will remain consistent due to our utilization of abs_gtr and carry_over
+
+**Test Cases:**
+```{r}
+print(subtract(ex1, ex2), DEC = TRUE) # -87651.181
+```
+```{r}
+print(subtract(ex2, ex3), DEC = TRUE) # 87681.50382
+```
+```{r}
+print(subtract(ex1, ex3), DEC = TRUE) #30.32282
+```
+```{r}
+print(subtract(ex3, ex1), DEC = TRUE) # -30.32282
+```
+```{r error=TRUE}
+subtract(22, ex3) # error
+```
+
+
+(c) Multiplication
+Use your add() function to write a multiplication function multiply(x, y) which can
+multiply two pqnumber objects x and y. Think about how you would multiply two large
+numbers by hand and implement that algorithm in R for two pqnumber objects. The function
+should also return a pqnumber object. Both functions should return a pqnumber object with
+enough p and q to carry the result. This question accounts for 15% of this assignment.
+
+**Using Add not required**
+
+
+#### **`multiply()`**
+
+**Algorithm:**
+
+1. Error handle as necessary
+
+2. Set length n to be the sum of all ps and qs of x and y plus 1
+
+3. Set vector z to be a 0 vector of length n
+
+4. Iterate over the total length of y plus 1 (call iterator i)
+
+5. Set our x leftover value to be the length of x, set the ith through ith + leftover elements of z to be the sum of our previous values of z (of these same indexed elements) with the product of numbers of x and the ith number of y
+
+6. Repeat step 5 over the whole loop
+
+7. carry over z using the carry_over() function
+
+8. Set our digit offset to be the length of our carried over z minus n (total length)
+
+9. Set our sign to be the product of the sign of x and y
+
+10. Set our new p to be the sum of x's and y's p
+
+11. Set our new q to be the length of our carried over z minus our new p minus 1
+
+12. return our product using pqnumber() with our new sign, new p, new q, and carried over z as our nums
+
+
+**Test Cases:**
+```{r}
+print(multiply(ex1, ex2), DEC = TRUE) # 275234.56794
+```
+```{r}
+print(multiply(ex2, ex3), DEC = TRUE) # -2382691.62996522
+```
+```{r}
+print(multiply(ex1, ex3), DEC = TRUE) # -85.3540548
+```
+```{r}
+print(multiply(ex1, ex1), DEC = TRUE) # 9.8596
+```
+```{r error=TRUE}
+subtract(22, ex3) # error
+```
