@@ -72,7 +72,7 @@ g2(x) = x - f(x) = x - log x + e^-x
 
 set f(x) = 0 => logx = e^-x => x = e^e^-x = g3(x)
 
-we have 3 different ways to fing g functions, each have different levels of success depending on the original function
+we have 3 different ways to find g functions, each have different levels of success depending on the original function
   
 picture examples in phone pics
 
@@ -99,7 +99,6 @@ Hence this diverges since x = 1 is the supremum of this function
 Hence this converges
 
 
-i pick out bitches like they seasonal, my depression
 
 Assume |g'(xt)| < 1, the worse case is sup|g'(xk)| = M
 
@@ -113,7 +112,7 @@ k >= (log[epsilon(1 - M)] - log|xk - x1|)/logM
 
 # Newtons Method
 
-ASsume f(x) is differentiable with root gamma
+Assume f(x) is differentiable with root gamma
 Assume f'(gamme) is not 0
 
 as we observe the roots of our tangent lines, we see that the x values approach gamma
