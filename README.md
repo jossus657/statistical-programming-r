@@ -1,6 +1,6 @@
 # Statistical-Programming-R
 
-An archive of files created while working on Statistical Programming with R course. Included files categorized by
+An archive of files and assignments created while working on Statistical Programming with R course. This course is an upper-division advanced course in R programming and its intersections with statistical programming, taken during winter of 2023. Included files categorized by:
 
 1. Notes
 
