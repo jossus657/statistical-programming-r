@@ -1,0 +1,442 @@
+---
+title: "102a Homework 5"
+author: "Joshua Susanto"
+date: "2023-03-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("405568250_stats102a_hw5.R")
+library(tidyverse)
+```
+
+## 1: Root-Finding Problem
+
+(1) Write R code using the Bisection method to solve the following equations within an error of 10^−8.
+
+
+(a) x^3 + 23 = 0
+
+
+```{r}
+f_parta <- function(x) x^3 + 23
+x_l <- -3
+x_r <- -2
+f_l <- f_parta(x_l)
+f_r <- f_parta(x_r)
+f_parta(x_l) * f_parta(x_r)
+```
+
+So our interval will be [-3,-2]
+
+$$(b-a)*(0.5)^n\leq10^{-8}\\
+(-2+3)*(0.5)^n\leq10^{-8}\\
+\log_{0.5}(0.5)^n\leq\log_{0.5}10^{-8}\\
+n\geq26.57542475$$
+
+
+Hence we expect 27 iterations for this problem
+
+```{r}
+tol <- 10^-8
+its <- 0
+
+while(x_r - x_l > tol) {
+  x_m <- (x_l + x_r) / 2
+  f_m <- f_parta(x_m)
+  if(identical(all.equal(f_m,0),TRUE)){
+    break
+  }
+  if(f_l * f_m < 0){
+    x_r <- x_m
+  } else{
+    x_l <- x_m
+  }
+  its <- its + 1
+}
+x_m
+its
+```
+
+
+
+
+(b) x^x − 18 = 0
+
+
+```{r}
+f_partb <- function(x) x^x -18
+x_l <- 2
+x_r <- 3
+f_l <- f_partb(x_l)
+f_r <- f_partb(x_r)
+f_partb(x_l) * f_partb(x_r)
+```
+
+So our interval will be [2,3]
+
+
+$$(b-a)*(0.5)^n\leq10^{-8}\\
+(3-2)*(0.5)^n\leq10^{-8}\\
+\log_{0.5}(0.5)^n\leq\log_{0.5}10^{-8}\\
+n\geq26.57542475$$
+
+Hence we expect 27 iterations for this problem
+
+
+```{r}
+tol <- 10^-8
+its <- 0
+while(x_r - x_l > tol) {
+  x_m <- (x_l + x_r) / 2
+  f_m <- f_partb(x_m)
+  if(identical(all.equal(f_m,0),TRUE)){
+    break
+  }
+  if(f_l * f_m < 0){
+    x_r <- x_m
+  } else{
+    x_l <- x_m
+  }
+  its <- its + 1
+}
+its
+x_m
+```
+
+
+
+(c) e^−x^^2^ − 1/10 = 0
+
+
+```{r}
+f_partc <- function(x) exp(-x^2) - 0.1
+x_l <- 1
+x_r <- 2
+f_l <- f_partc(x_l)
+f_r <- f_partc(x_r)
+f_partc(x_l) * f_partc(x_r)
+```
+
+So our interval will be [1,2]
+
+
+$$(b-a)*(0.5)^n\leq10^{-8}\\
+(2-1)*(0.5)^n\leq10^{-8}\\
+\log_{0.5}(0.5)^n\leq\log_{0.5}10^{-8}\\
+n\geq26.57542475$$
+
+Hence we expect 27 iterations for this problem
+
+
+
+```{r}
+tol <- 10^-8
+its <- 0
+
+while(x_r - x_l > tol) {
+  x_m <- (x_l + x_r) / 2
+  f_m <- f_partc(x_m)
+  if(f_l * f_m < 0){
+    x_r <- x_m
+  } else{
+    x_l <- x_m
+  }
+  its <- its + 1
+}
+its
+x_m
+```
+
+
+This function has two zeroes, the second one falls within [-2,-1]
+
+```{r}
+x_l <- -2
+x_r <- -1
+f_l <- f_partc(x_l)
+f_r <- f_partc(x_r)
+f_partc(x_l) * f_partc(x_r)
+```
+
+
+
+$$(b-a)*(0.5)^n\leq10^{-8}\\
+(-1-(-2))*(0.5)^n\leq10^{-8}\\
+\log_{0.5}(0.5)^n\leq\log_{0.5}10^{-8}\\
+n\geq26.57542475$$
+
+Hence we expect 27 iterations for this problem
+
+
+
+```{r}
+tol <- 10^-8
+its <- 0
+
+while(x_r - x_l > tol) {
+  x_m <- (x_l + x_r) / 2
+  f_m <- f_partc(x_m)
+  if(f_l * f_m < 0){
+    x_r <- x_m
+  } else{
+    x_l <- x_m
+  }
+  its <- its + 1
+}
+its
+x_m
+```
+
+
+(2) Please write R code using the Fixed point iteration method to solve the equation (b). Explain your algorithm prior to the code. (explain which g you are using and why)
+Note: You may answer and write code for above two questions directly on Rmd file.
+
+
+
+In order to start our fixed point algorithm, we need to find our three candidates for g(x) like so:
+
+$$f(x) = x^x - 18 \\
+g_1(x) = x - f(x) = -x^x + x - 18\\
+g_2(x) = f(x) + x = x^x + x + 18\\
+\\ Let \; f(x) = 0;\; 0 = x^x - 18\\
+18 = x^x\\
+ln(18) = ln(x)^x\\
+ln(18) = xln(x)\\
+g_3(x) = x = \frac{ln(18)}{ln(x)}$$
+
+
+Now that we have our three candidates we need to check our convergence criterion for each case (with interval [2,3]) in order to find which choice of g will be best.
+
+
+
+$$|g_1^{'}(x)| = |-x^x(1+ln(x)) + 1|\leq|g_1^{'}(3)|\;for\;x\in[2,3]\\
+|g_1^{'}(3)| = |-55.66| > 1,\;so \;g_1(x)\; diverges\\
+|g_2^{'}(x)| = |x^x(1+ln(x)) + 1|\leq|g_2^{'}(3)|\;for\;x\in[2,3]\\
+|g_2^{'}(3)| = |-57.66| > 1,\;so \;g_2(x)\; diverges\\$$
+
+
+$$|g_3^{'}(x)| = |-\frac{ln(18)}{xln^2(x)}|\\
+|g_3^{'}(3) = |-0.798| < 1, \;so \;g_3\;converges\;and\;will\;be\;used$$
+
+
+
+Since 3 is within our range of attraction, we will use x = 3 as our starting point
+
+
+
+```{r}
+g <- function(x){
+  log(18)/log(x)
+}
+x_1 <- 3
+x_2 <- g(x_1)
+i <- 0
+tol <- 1e-8
+while(abs(x_2 - x_1) > tol){
+  x_1 <- x_2
+  x_2 <- g(x_1)
+  i <- i + 1
+}
+x_2
+```
+
+
+
+(3) Use the Newton’s method to compute the square root by using only simple arithmetic
+operations1
+
+(a) Please write a function, get_sqrt(), that computes the square root of an arbitrary
+positive number. The function should take four arguments, the last three have default
+values:
+
+
+a a non-negative number to compute the square root of.
+
+
+tol determines when you consider two iterates to be equal.
+
+
+iter max gives the maximum number of iterations.
+
+
+verbose determines if you want to display intermediate results
+
+
+#### **`get_sqrt()`**
+
+**Algorithm:**
+
+1. Check for errors and undesirable inputs.
+
+2. Initialize function f to be x*x - a, this will be the function that we use Newton's on
+
+3. Initialize the derivative of f to be 2*x
+
+4. Initialize iterations to be 0, and start loop to last while |f(x)| < tol and iterations < iter_max
+
+5. Set x to be x minus f(x)/f'(x), add 1 to our iteration count
+
+6. If verbose is true, print this value of x
+
+7. Continue until loop breaks, return our final x value
+
+
+
+(b) Give an example of your function by computing the square root of 5.
+
+```{r}
+get_sqrt(5)
+get_sqrt(5, verbose = TRUE)
+```
+
+
+(c) How would the program change to compute an arbitrary, positive integer, root? Please
+use calculus to determine an appropriate iterative equation for approximating this
+arbitrary root.
+
+This program's internal function would change to determine an arbitrary root. In particular, the power of x will correspond to whatever root we decide to do. 
+
+
+$$Let\;f(x) = x^n-a \\
+0 = x^n - a\\
+x = \sqrt[n]{a}\\
+0 = f(x_0) + f′(x_0)(x_1 − x_0)\\
+0 = f(x_0) + f′(x_0)x_1 − f′(x_0)x_0\\
+f′(x_0)x_1 = f′(x_0)x_0 − f(x_0)\\
+x_1 = x_0 − \frac{f(x_0)}{f′(x_0)} \\
+x_1= x_0 - \frac{x_0^n-a}{nx_0^{n-1}}$$
+
+
+(d) Write an R function, get_abroot(), like the one for square root which calculates the
+arbitrary root of a number. I.e., the root argument is required for the function.
+
+
+#### **`get_abroot()`**
+
+**Algorithm:**
+
+1. Check for errors and undesirable inputs.
+
+2. Initialize function f to be x^(root) - a, this will be the function that we use Newton's on
+
+3. Initialize the derivative of f to be root*x^(root-1)
+
+4. Initialize iterations to be 0, and start loop to last while |f(x)| < tol and iterations < iter_max
+
+5. Set x <- x - f(x)/f'(x), add 1 to our iteration count
+
+6. If verbose is true, print this value of x
+
+7. Continue until loop breaks, return our final x value
+
+
+
+(e) Give an example of your function by computing the seventh root of 13.
+
+```{r}
+get_abroot(13,7)
+get_abroot(13, 7, verbose = TRUE)
+```
+
+
+(f) Let ek = |xk − root(7)√13|, where k indicates the kth iteration. Please print from e1 to e4, and specify your findings
+
+```{r}
+results <- c(get_abroot(13, 7, iter_max = 1), get_abroot(13, 7, iter_max = 2), get_abroot(13, 7, iter_max = 3), get_abroot(13, 4, iter_max = 5))
+abs(results - get_abroot(13,7))
+```
+
+
+
+## 2. Optimization Problem
+
+(a) Using calculus, find the minimum of the function f(x) = x n − nα log(x), n = 1, 2, ... and α > 0.
+
+$$f(x) = x^n − n\alpha ln(x),\; n = 1, 2, ... \;and\;\alpha > 0 \\
+f′(x)= nx^{n-1}-\frac{n\alpha}{x}\\
+0 = nx^{n-1}-\frac{n\alpha}{x}\\
+xnx^{n-1}= n\alpha\\
+nx^{n}= n\alpha\\
+x = \sqrt[n]\alpha$$
+
+
+
+$$f′′(x) = n(n-1)x^{n-2}+n\alpha x^{-2}\\
+f′′(\alpha) = n(n-1)\alpha^{n-2}+n\alpha \alpha^{-2} > 0 \; for \; n = 1, 2, ... \;and\;\alpha > 0\\ $$
+
+
+Hence, by the second derivative test, the minimum of the function occus at x = n root of α
+
+
+
+(b) Using your formulas for the derivatives of f, write down Newton’s method to find the
+minimum.
+
+
+$$f(x) = x^n − n\alpha ln(x),\; n = 1, 2, ... \;and\;\alpha > 0 \\
+f′(x)= nx^{n-1}-\frac{n\alpha}{x}\\
+f′′(x) = n(n-1)x^{n-2}+n\alpha x^{-2}\\
+f′′(x_k)x_{k+1} = f′(x_k)x_k − f′(x_k)\\
+x_{k+1} = x_k − \frac{f′(x_k)}{f′′(x_k)}\\
+x_{k+1} = x_k − \frac{nx_k^{n-1}-\frac{n\alpha}{x_k}}{n(n-1)x_k^{n-2}+n\alpha x_k^{-2}}$$
+
+
+(c) Use R to write a function, get_min(), which takes the following arguments:
+
+
+f an expression to minimize with respect to x
+
+
+x an initial guess
+
+
+... any additional variables needed by f
+
+
+Choose an appropriate stopping rule and, using your function, return the minimum of
+f for n = 2 and α = 3
+
+
+
+#### **`get_min()`**
+
+**Algorithm:**
+
+1. Check for errors and undesirable inputs.
+
+2. Initialize function f_expr to be f
+
+3. Find f_prime and f_dub_prime with D() function
+
+4. Initialize iterations to be 0, and start loop to last while |f'(x)| < tol and iterations < iter_max
+
+5. Set x <- x - f'(x)/f''(x), add 1 to our iteration count
+
+6. If verbose is true, print this value of x
+
+7. Continue until loop breaks, return our final x value
+
+
+```{r}
+get_min(expression(x^n-n*a*log(x)), x = 1, n = 2, a = 3)
+```
+
+
+
+(d) Plot the function and the steps taken by your method starting from x0 = 1
+
+```{r}
+f <- expression(x^2 - 6*log(x))
+x <- c(get_min(expression(x^n-n*a*log(x)), x = 1, n = 2, a = 3, iter_max = 1),
+           get_min(expression(x^n-n*a*log(x)), x = 1, n = 2, a = 3, iter_max = 2),
+           get_min(expression(x^n-n*a*log(x)), x = 1, n = 2, a = 3, iter_max = 3),
+           get_min(expression(x^n-n*a*log(x)), x = 1, n = 2, a = 3, iter_max = 4))
+graph_f <- function(x) {
+  x^2 - 6*log(x)
+}
+curve(graph_f, from = 0, to = 3)
+points(x, eval(f))
+```
+
