@@ -72,3 +72,4 @@ but how is this new value decided?
 
 we want our new intervals and values to keep the same ratios
 
+
